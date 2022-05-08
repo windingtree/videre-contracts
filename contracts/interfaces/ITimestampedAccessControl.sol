@@ -11,5 +11,9 @@ interface ITimestampedAccessControl {
     /// @param account to check the status of
     /// @param when the granted status is being questioned
     /// @return If the account actively had the role at when
-    function hadRole(bytes32 role, address account, uint256 when) external returns (bool);
+    function hadRole(
+        bytes32 role,
+        address account,
+        uint256 when
+    ) external returns (bool);
 }

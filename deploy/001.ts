@@ -19,10 +19,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     from: deployer,
     log: true,
     autoMine: true, // speed up deployment on local network, no effect on live network.
-    args: [
-      'videre-stays',
-      '1'
-    ]
+    args: ['videre-stays', '1']
   })
 
   if (staysFacilityDeploy.newlyDeployed) {
