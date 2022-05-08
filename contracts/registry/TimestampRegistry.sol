@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.13;
 
-import {ITimestampRegistry} from "./interfaces/ITimestampRegistry.sol";
+import {ITimestampRegistry} from "../interfaces/ITimestampRegistry.sol";
 
 /// @title A simple timestamp registry implementation
 /// @author mfw78 <mfw78@protonmail.com>
