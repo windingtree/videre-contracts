@@ -39,10 +39,10 @@ contract Vat {
     }
 
     // --- data
-    mapping(bytes32 => mapping(address => uint256)) public bag; // [wad] - providers & vouchers
-    mapping(address => mapping(address => uint256)) public gem; // [wad] - depositors (providers & consumers)
+    mapping(bytes32 => mapping(address => uint256)) public bags; // [wad] - providers & vouchers
+    mapping(address => mapping(address => uint256)) public gems; // [wad] - depositors (providers & consumers)
 
-    mapping(bytes32 => address) public own; // owners of vouchers
+    mapping(bytes32 => address) public owns; // owners of vouchers
 
     uint256 public live; // Active flag
 
@@ -83,90 +83,90 @@ contract Vat {
     // --- Fungibility
     function slip(
         address usr,
-        address token,
+        address gem,
         int256 wad
     ) external auth {
-        gem[usr][token] = _add(gem[usr][token], wad);
+        gems[usr][gem] = _add(gems[usr][gem], wad);
     }
 
     function slip(
         bytes32 who,
-        address token,
+        address gem,
         int256 wad
     ) external auth {
-        bag[who][token] = _add(bag[who][token], wad);
+        bags[who][gem] = _add(bags[who][gem], wad);
     }
 
     /// @dev Normal accounts
     function flux(
         address src,
         address dst,
-        address token,
+        address gem,
         uint256 wad
     ) external {
         require(wish(src, msg.sender), 'Vat/not-allowed');
-        gem[src][token] = gem[src][token] - wad;
-        gem[dst][token] = gem[dst][token] + wad;
+        gems[src][gem] = gems[src][gem] - wad;
+        gems[dst][gem] = gems[dst][gem] + wad;
     }
 
     // --- Voucher Handling
     function deal(
-        bytes32 v,
-        address u,
-        address t,
+        bytes32 stub,
+        address usr,
+        address gem,
         uint256 wad,
         uint256 fee
     ) external auth {
         // system is live
         require(live == 1, 'Vat/not-live');
         // voucher does not exist
-        require(both(bag[v][t] == 0, own[v] == address(0)), 'Vat/voucher-exists');
+        require(both(bags[stub][gem] == 0, owns[stub] == address(0)), 'Vat/voucher-exists');
         // user has enough funds to pay
-        require(gem[u][t] >= wad, 'Vat/insufficient-funds');
+        require(gems[usr][gem] >= wad, 'Vat/insufficient-funds');
         // protocol fee isn't higher than cost
         require(fee <= wad, 'Vat/fee-too-high');
 
         address i = msg.sender; // the industry
 
         uint256 net = _sub(wad, fee); // calculate net voucher cost
-        gem[u][t] = _sub(gem[u][t], wad); // deduct user's account
-        bag[v][t] = net; // capitalise the voucher
-        gem[i][t] += fee; // pay the protocol fee
+        gems[usr][gem] = _sub(gems[usr][gem], wad); // deduct user's account
+        bags[stub][gem] = net; // capitalise the voucher
+        gems[i][gem] += fee; // pay the protocol fee
 
-        own[v] = u; // set the voucher's owner
+        owns[stub] = usr; // set the voucher's owner
     }
 
-    // --- Voucher fungibility
+    // --- Stub fungibility
     function swap(
-        bytes32 v,
+        bytes32 stub,
         address src,
         address dst,
-        address t,
+        address gem,
         uint256 wad,
         uint256 fee
     ) external auth {
         // system is live
         require(live == 1, 'Vat/not-live');
         // voucher owner is correct
-        require(own[v] == src, 'Vat/invalid-src');
+        require(owns[stub] == src, 'Vat/not-allowed');
         // user has enough funds to pay
-        require(gem[dst][t] >= wad, 'Vat/insufficient-funds');
+        require(gems[dst][gem] >= wad, 'Vat/insufficient-funds');
         // protocol fee isn't higher than cost
         require(fee <= wad, 'Vat/fee-too-high');
 
         uint256 net = _sub(wad, fee); // calculate net voucher cost
-        gem[dst][t] = _sub(gem[dst][t], wad); // deduct user's account
-        gem[src][t] += net; // pay the seller
-        bag[v][t] += fee; // add capital to the voucher
+        gems[dst][gem] = _sub(gems[dst][gem], wad); // deduct user's account
+        gems[src][gem] += net; // pay the seller
+        bags[stub][gem] += fee; // add capital to the voucher
 
-        own[v] = dst; // set the voucher's owner
+        owns[stub] = dst; // set the voucher's owner
     }
 
-    // --- Voucher settlement
+    // --- Stub settlement
     function move(
         bytes32 src,
         bytes32 dst,
-        address t,
+        address gem,
         uint256 wad,
         uint256 fee
     ) external auth {
@@ -178,22 +178,22 @@ contract Vat {
         address i = msg.sender;
 
         uint256 net = _sub(wad, fee);
-        bag[src][t] = _sub(bag[src][t], wad);
-        bag[dst][t] += net;
+        bags[src][gem] = _sub(bags[src][gem], wad);
+        bags[dst][gem] += net;
 
-        gem[i][t] += fee;
+        gems[i][gem] += fee;
 
         // cleanup
-        if (bag[src][t] == 0) {
-            if (own[src] != address(0)) delete own[src];
-            delete bag[src][t];
+        if (bags[src][gem] == 0) {
+            if (owns[src] != address(0)) delete owns[src];
+            delete bags[src][gem];
         }
     }
 
     function suck(
         bytes32 src,
         address dst,
-        address t,
+        address gem,
         uint256 wad,
         uint256 fee
     ) external auth {
@@ -205,9 +205,9 @@ contract Vat {
         address i = msg.sender;
 
         uint256 net = _sub(wad, fee);
-        bag[src][t] = _sub(bag[src][t], wad);
-        gem[dst][t] += net;
+        bags[src][gem] = _sub(bags[src][gem], wad);
+        gems[dst][gem] += net;
 
-        gem[i][t] += fee;
+        gems[i][gem] += fee;
     }
 }
