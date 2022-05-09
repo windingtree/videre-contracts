@@ -8,7 +8,7 @@ import '@typechain/hardhat'
 import 'hardhat-deploy'
 import 'hardhat-gas-reporter'
 import 'solidity-coverage'
-import 'solidity-docgen'
+import 'hardhat-docgen'
 import { nodeUrl, accounts } from './utils/network'
 
 import 'dotenv/config'
@@ -120,6 +120,11 @@ const config: HardhatUserConfig = {
     etherscan: {
       apiKey: process.env.ETHERSCAN_API_KEY
     }
+  },
+  docgen: {
+    path: './docs',
+    clear: true,
+    runOnCompile: true
   }
 }
 

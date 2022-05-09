@@ -19,6 +19,7 @@ typechain/
 reports/
 coverage*
 inheritance-graph.dot
+docs/
 
 # dotenv
 .env*
