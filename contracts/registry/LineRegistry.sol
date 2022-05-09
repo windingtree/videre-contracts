@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.13;
 
-import {Context} from "@openzeppelin/contracts/utils/Context.sol";
+import {Context} from '@openzeppelin/contracts/utils/Context.sol';
 
 import {IServiceProviderRegistry, Role} from '../interfaces/IServiceProviderRegistry.sol';
 import {ILineRegistry} from '../interfaces/ILineRegistry.sol';
