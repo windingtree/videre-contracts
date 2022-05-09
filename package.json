@@ -6,7 +6,7 @@
     "email": "mfw78@protonmail.com"
   },
   "license": "GPL-3.0-only",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "homepage": "https://windingtree.com/",
   "keywords": [
     "windingtree",
@@ -17,9 +17,14 @@
     "url": "https://github.com/windingtree/videre-contracts"
   },
   "files": [
+    "contracts/access",
     "contracts/interfaces",
     "contracts/libraries",
+    "contracts/registries",
+    "contracts/treasury",
+    "contracts/utils",
     "artifacts/contracts/**/*.json",
+    "!artifacts/contracts/test/**/*",
     "!artifacts/contracts/**/*.dbg.json"
   ],
   "engines": {
