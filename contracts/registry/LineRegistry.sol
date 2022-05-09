@@ -2,22 +2,31 @@
 
 pragma solidity ^0.8.13;
 
+import {Context} from "@openzeppelin/contracts/utils/Context.sol";
+
 import {IServiceProviderRegistry, Role} from '../interfaces/IServiceProviderRegistry.sol';
 import {ILineRegistry} from '../interfaces/ILineRegistry.sol';
 
-import {AccessControl} from '@openzeppelin/contracts/access/AccessControl.sol';
-
 /// @title Economic line registry (ie. registry of Industries)
 /// @author mfw78 <mfw78@protonmail.com>
-contract LineRegistry is ILineRegistry, AccessControl {
-    // --- auth
-    mapping(bytes32 => mapping(bytes32 => uint256)) private gatekeeper;
-    uint256 private selfRegister;
+contract LineRegistry is ILineRegistry, Context {
+    // --- Auth
+    mapping(address => uint256) public wards;
+
+    function rely(address usr) external auth {
+        wards[usr] = 1;
+    }
+
+    function deny(address usr) external auth {
+        wards[usr] = 0;
+    }
 
     modifier auth() {
-        require(hasRole(DEFAULT_ADMIN_ROLE, _msgSender()), 'registry/not-authorized');
+        require(wards[msg.sender] == 1, 'Registry/not-authorized');
         _;
     }
+    mapping(bytes32 => mapping(bytes32 => uint256)) private gatekeeper;
+    uint256 private selfRegister;
 
     /// @inheritdoc ILineRegistry
     function hope(bytes32 line, bytes32 which) external auth {
@@ -68,7 +77,7 @@ contract LineRegistry is ILineRegistry, AccessControl {
 
     /// @param registry of service providers conforming to the `IServiceProviderRegistry`
     constructor(IServiceProviderRegistry registry, uint256 _selfRegister) {
-        _setupRole(DEFAULT_ADMIN_ROLE, _msgSender());
+        wards[_msgSender()] = 1;
         serviceProviderRegistry = registry;
         selfRegister = _selfRegister;
     }
