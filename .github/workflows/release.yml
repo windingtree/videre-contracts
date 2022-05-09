@@ -12,10 +12,8 @@ jobs:
         with:
           node-version: '16.x'
           registry-url: 'https://registry.npmjs.org'
-          # Defaults to the user or organization that owns the workflow file
-          scope: '@windingtree'
-      - run: yarn
-      - run: yarn hardhat compile
-      - run: yarn publish --access public
+      - run: npm i
+      - run: npx hardhat compile
+      - run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
