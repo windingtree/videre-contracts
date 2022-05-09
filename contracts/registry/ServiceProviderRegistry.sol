@@ -9,8 +9,6 @@ import {AccessControl} from '@openzeppelin/contracts/access/AccessControl.sol';
 import {AbstractTimestampedAccessControl} from '../access/AbstractTimestampedAccessControl.sol';
 import {AbstractWhitelistExpiry} from '../access/AbstractWhitelistExpiry.sol';
 
-uint256 constant WHITELIST_EXPIRY = 180 days;
-
 /// @title A source of service providers
 /// @author mfw78 <mfw78@protonmail.com>
 contract ServiceProviderRegistry is IServiceProviderRegistry, AccessControl, AbstractWhitelistExpiry {
@@ -66,7 +64,7 @@ contract ServiceProviderRegistry is IServiceProviderRegistry, AccessControl, Abs
         return keccak256(abi.encodePacked(which, uint256(what)));
     }
 
-    constructor() AbstractWhitelistExpiry(block.timestamp + WHITELIST_EXPIRY) {
+    constructor(uint256 whitelistTTL) AbstractWhitelistExpiry(block.timestamp + whitelistTTL) {
         _setupRole(DEFAULT_ADMIN_ROLE, _msgSender());
     }
 
