@@ -11,7 +11,7 @@ import {AbstractWhitelistExpiry} from '../access/AbstractWhitelistExpiry.sol';
 
 /// @title A source of service providers
 /// @author mfw78 <mfw78@protonmail.com>
-contract ServiceProviderRegistry is IServiceProviderRegistry, AccessControl, AbstractWhitelistExpiry {
+contract ServiceProviderRegistry is IServiceProviderRegistry, AbstractTimestampedAccessControl, AbstractWhitelistExpiry {
     // --- data ---
 
     // TODO: Analyse setting maximum TTL for accounts to prevent malicious signers granting tickets.
@@ -39,6 +39,7 @@ contract ServiceProviderRegistry is IServiceProviderRegistry, AccessControl, Abs
     }
 
     /// TODO: Standardise around can() returns to uint for gas savings
+    /// TODO: Add hadRole for timestamped access control
     /// @inheritdoc IServiceProviderRegistry
     function can(
         bytes32 which,
@@ -86,7 +87,6 @@ contract ServiceProviderRegistry is IServiceProviderRegistry, AccessControl, Abs
         _setRoleAdmin(_calcRole(provider, Role.API), adminRole);
         _setRoleAdmin(_calcRole(provider, Role.BIDDER), adminRole);
         _setRoleAdmin(_calcRole(provider, Role.MANAGER), adminRole);
-        _setRoleAdmin(_calcRole(provider, Role.FINANCE), adminRole);
         _setRoleAdmin(_calcRole(provider, Role.STAFF), adminRole);
         _setRoleAdmin(_calcRole(provider, Role.WRITE), adminRole);
 
@@ -130,5 +130,13 @@ contract ServiceProviderRegistry is IServiceProviderRegistry, AccessControl, Abs
         if (what == 'end') AbstractWhitelistExpiry.file(data);
         else if (what == 'minTTL') minTTL = data;
         else revert('registry/file-unrecognized-param');
+    }
+
+    function _grantRole(bytes32 role, address account) internal override(AccessControl, AbstractTimestampedAccessControl) {
+        AbstractTimestampedAccessControl._grantRole(role, account);
+    }
+
+    function _revokeRole(bytes32 role, address account) internal override(AccessControl, AbstractTimestampedAccessControl) {
+        AbstractTimestampedAccessControl._revokeRole(role, account);
     }
 }

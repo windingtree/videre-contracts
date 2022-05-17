@@ -30,7 +30,7 @@ abstract contract AbstractTimestampedAccessControl is AccessControl, ITimestampe
 
     /// @dev Standard call for OZ access control, followed by timestamping
     /// @inheritdoc AccessControl
-    function _grantRole(bytes32 role, address account) internal override(AccessControl) {
+    function _grantRole(bytes32 role, address account) internal virtual override(AccessControl) {
         AccessControl._grantRole(role, account);
 
         // @dev set the timestamp
@@ -41,7 +41,7 @@ abstract contract AbstractTimestampedAccessControl is AccessControl, ITimestampe
 
     /// @dev Standard call for OZ access control, followed by timestamping
     /// @inheritdoc AccessControl
-    function _revokeRole(bytes32 role, address account) internal override(AccessControl) {
+    function _revokeRole(bytes32 role, address account) internal virtual override(AccessControl) {
         AccessControl._revokeRole(role, account);
 
         // @dev set the timestamp
