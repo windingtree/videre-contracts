@@ -8,24 +8,24 @@ import {ECDSA} from '@openzeppelin/contracts/utils/cryptography/ECDSA.sol';
 /// @title Videre Library for structs / EIP712 signing
 library LibVidere {
     bytes32 private constant ERC20NATIVE_TYPEHASH = keccak256('ERC20Native(address gem,uint256 wad)');
-    bytes32 private constant BIDTERM_TYPEHASH = keccak256('BidTerm(bytes32 term,address impl,bytes payload)');
+    bytes32 private constant BIDTERM_TYPEHASH = keccak256('BidTerm(bytes32 term,address impl,bytes txPayload)');
     bytes32 private constant BIDOPTION_ITEM_TYPEHASH =
         keccak256('BidOptionItem(bytes32 item,ERC20Native[] cost)ERC20Native(address gem,uint256 wad)');
     bytes32 private constant BIDOPTION_TERM_TYPEHASH =
         keccak256(
-            'BidOptionTerm(BidTerm term,ERC20Native[] cost)BidTerm(bytes32 term,address impl,bytes payload)ERC20Native(address gem,uint256 wad)'
+            'BidOptionTerm(BidTerm term,ERC20Native[] cost)BidTerm(bytes32 term,address impl,bytes txPayload)ERC20Native(address gem,uint256 wad)'
         );
     bytes32 private constant BIDOPTIONS_TYPEHASH =
         keccak256(
-            'BidOptions(BidOptionItem[] items,BidOptionTerm[] terms)BidOptionItem(bytes32 item,ERC20Native[] cost)BidOptionTerm(BidTerm term,ERC20Native[] cost)BidTerm(bytes32 term,address impl,bytes payload)ERC20Native(address gem,uint256 wad)'
+            'BidOptions(BidOptionItem[] items,BidOptionTerm[] terms)BidOptionItem(bytes32 item,ERC20Native[] cost)BidOptionTerm(BidTerm term,ERC20Native[] cost)BidTerm(bytes32 term,address impl,bytes txPayload)ERC20Native(address gem,uint256 wad)'
         );
     bytes32 private constant BID_TYPEHASH =
         keccak256(
-            'Bid(bytes32 salt,uint128 limit,uint128 expiry,bytes32 which,bytes32 params,bytes32[] items,BidTerm[] terms,BidOptions options,ERC20Native[] cost)BidOptionItem(bytes32 item,ERC20Native[] cost)BidOptionTerm(BidTerm term,ERC20Native[] cost)BidOptions(BidOptionItem[] items,BidOptionTerm[] terms)BidTerm(bytes32 term,address impl,bytes payload)ERC20Native(address gem,uint256 wad)'
+            'Bid(bytes32 salt,uint128 limit,uint128 expiry,bytes32 which,bytes32 params,bytes32[] items,BidTerm[] terms,BidOptions options,ERC20Native[] cost)BidOptionItem(bytes32 item,ERC20Native[] cost)BidOptionTerm(BidTerm term,ERC20Native[] cost)BidOptions(BidOptionItem[] items,BidOptionTerm[] terms)BidTerm(bytes32 term,address impl,bytes txPayload)ERC20Native(address gem,uint256 wad)'
         );
     bytes32 private constant VOUCHER_STATE_TYPEHASH =
         keccak256(
-            'VoucherState(bytes32 which,bytes32 params,bytes32[] items,BidTerm[] terms,ERC20Native cost)BidTerm(bytes32 term,address impl,bytes payload)ERC20Native(address gem,uint256 wad)'
+            'VoucherState(bytes32 which,bytes32 params,bytes32[] items,BidTerm[] terms,ERC20Native cost)BidTerm(bytes32 term,address impl,bytes txPayload)ERC20Native(address gem,uint256 wad)'
         );
 
     // --- ERC20 Native messages
