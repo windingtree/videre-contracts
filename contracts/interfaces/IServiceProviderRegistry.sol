@@ -13,7 +13,6 @@ enum Role {
     API,
     BIDDER,
     MANAGER,
-    FINANCE,
     STAFF,
     WRITE
 }
