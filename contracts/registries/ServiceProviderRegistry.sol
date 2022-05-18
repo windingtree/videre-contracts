@@ -2,16 +2,17 @@
 
 pragma solidity ^0.8.13;
 
-import {IServiceProviderRegistry, Role} from '../interfaces/IServiceProviderRegistry.sol';
-
 import {AccessControl} from '@openzeppelin/contracts/access/AccessControl.sol';
+import {Multicall} from '@openzeppelin/contracts/utils/Multicall.sol';
+
+import {IServiceProviderRegistry, Role} from '../interfaces/IServiceProviderRegistry.sol';
 
 import {AbstractTimestampedAccessControl} from '../access/AbstractTimestampedAccessControl.sol';
 import {AbstractWhitelistExpiry} from '../access/AbstractWhitelistExpiry.sol';
 
 /// @title A source of service providers
 /// @author mfw78 <mfw78@protonmail.com>
-contract ServiceProviderRegistry is IServiceProviderRegistry, AbstractTimestampedAccessControl, AbstractWhitelistExpiry {
+contract ServiceProviderRegistry is IServiceProviderRegistry, AbstractTimestampedAccessControl, AbstractWhitelistExpiry, Multicall {
     // --- data ---
 
     // TODO: Analyse setting maximum TTL for accounts to prevent malicious signers granting tickets.
