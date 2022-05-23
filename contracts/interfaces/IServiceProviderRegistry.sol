@@ -22,7 +22,7 @@ enum Role {
 /// @notice Use this registry to get information about a service provider
 interface IServiceProviderRegistry {
     event ServiceProviderRegistered(bytes32 which, address who);
-    event ServiceProviderUpdated(bytes32 which);
+    event ServiceProviderUpdated(bytes32 which, bytes32 what);
 
     /// @notice Enroll a service provider in the registry
     /// @dev Require the dataURI to be specified

@@ -106,10 +106,9 @@ contract ServiceProviderRegistry is IServiceProviderRegistry, AbstractTimestampe
         if (what == 'dataURI') {
             require(bytes(data).length > 0, 'registry/require-uri');
             datastores[which] = data;
-            emit ServiceProviderUpdated(which);
-        } else {
-            revert('registry/file-unrecognized-param');
-        }
+            emit ServiceProviderUpdated(which, what);
+        } 
+        else revert('registry/file-unrecognized-param');
     }
 
     function file(
@@ -117,7 +116,10 @@ contract ServiceProviderRegistry is IServiceProviderRegistry, AbstractTimestampe
         bytes32 what,
         uint256 data
     ) external onlyAdmin(which) {
-        if (what == 'maxTTL') maxTTL[which] = data;
+        if (what == 'maxTTL') {
+            maxTTL[which] = data;
+            emit ServiceProviderUpdated(which, what);
+        }
         else revert('registry/file-unrecognized-param');
     }
 
