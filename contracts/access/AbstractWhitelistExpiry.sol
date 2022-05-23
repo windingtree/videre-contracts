@@ -14,7 +14,7 @@ abstract contract AbstractWhitelistExpiry is AccessControl {
     uint256 internal end;
 
     // --- events
-    event WhitelistChanged(uint256 end);
+    event WhitelistChanged(uint256);
 
     // --- auth
     /// @dev Access only for those on the whitelist, or after whitelist time
@@ -23,10 +23,10 @@ abstract contract AbstractWhitelistExpiry is AccessControl {
         _;
     }
 
-    /// @param expiry for when the whitelist ceases to be a restriction
-    constructor(uint256 expiry) {
-        require(expiry > block.timestamp, 'whitelist/not-future');
-        end = expiry;
+    /// @param whitelistTTL how long the whitelist should be valid for
+    constructor(uint256 whitelistTTL) {
+        end = block.timestamp + whitelistTTL;
+        emit WhitelistChanged(end);
     }
 
     /// @notice Set when to end
