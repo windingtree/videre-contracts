@@ -66,7 +66,7 @@ contract ServiceProviderRegistry is IServiceProviderRegistry, AbstractTimestampe
         return keccak256(abi.encodePacked(which, uint256(what)));
     }
 
-    constructor(uint256 whitelistTTL) AbstractWhitelistExpiry(block.timestamp + whitelistTTL) {
+    constructor(uint256 whitelistTTL) AbstractWhitelistExpiry(whitelistTTL) {
         _setupRole(DEFAULT_ADMIN_ROLE, _msgSender());
     }
 
