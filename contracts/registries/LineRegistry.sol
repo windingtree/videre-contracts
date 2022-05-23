@@ -22,7 +22,7 @@ contract LineRegistry is ILineRegistry, Context {
     }
 
     modifier auth() {
-        require(wards[msg.sender] == 1, 'Registry/not-authorized');
+        require(wards[msg.sender] == 1, 'registry/not-authorized');
         _;
     }
     mapping(bytes32 => mapping(bytes32 => uint256)) private gatekeeper;
@@ -51,8 +51,7 @@ contract LineRegistry is ILineRegistry, Context {
     /// @inheritdoc ILineRegistry
     function can(bytes32 line, bytes32 which) public view returns (bool) {
         // @dev this requirement allows lines of industries to be removed without removing mapped state
-        require(exists(line), 'registry/no-such-line');
-        return (gatekeeper[line][which] == 1);
+        return (exists(line) && gatekeeper[line][which] == 1);
     }
 
     // --- data
@@ -91,8 +90,14 @@ contract LineRegistry is ILineRegistry, Context {
         address data
     ) external auth {
         /// @dev setting address(0) for terms effectively disables an entire line
-        if (what == 'terms') lines[line].terms = data;
-        else if (what == 'service_provider_registry') serviceProviderRegistry = IServiceProviderRegistry(data);
+        if (what == 'terms') {
+            if (data == address(0)) delete lines[line];
+            else lines[line].terms = data;
+        }
+        else if (what == 'service_provider_registry') {
+            require(data != address(0), 'registry/invalid-spregistry');
+            serviceProviderRegistry = IServiceProviderRegistry(data);
+        }
         else revert('registry/file-unrecognized-param');
     }
 
