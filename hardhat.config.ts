@@ -31,7 +31,12 @@ const config: HardhatUserConfig = {
     deployer: 0,
     alice: 1,
     bob: 2,
-    carol: 3
+    carol: 3,
+    admin: 4,
+    api: 5,
+    bidder: 6,
+    manager: 7,
+    staff: 8
   },
   networks: {
     hardhat: {
