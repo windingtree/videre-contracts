@@ -57,6 +57,21 @@ contract ServiceProviderRegistry is IServiceProviderRegistry, AbstractTimestampe
         }
     }
 
+    /// @notice Time truthfullness statements on role membership
+    /// @param which service provider the role existed for
+    /// @param what role to check a user had access to
+    /// @param who to check had the role
+    /// @param when it is being asserted that they had the role
+    /// @return true if the user had the role at a specified time
+    function could(
+        bytes32 which,
+        Role what,
+        address who,
+        uint256 when
+    ) public view returns (bool) {
+        return hadRole(_calcRole(which, what), who, when);
+    }
+
     /// @notice Calculate the role hash for a service provider and specific role type
     /// @param which service provider the role shall exist for
     /// @param what role to calculate for which provider
