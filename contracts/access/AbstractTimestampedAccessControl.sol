@@ -11,7 +11,7 @@ import {ITimestampedAccessControl} from '../interfaces/ITimestampedAccessControl
 /// @author mfw78 <mfw78@protonmail.com>
 abstract contract AbstractTimestampedAccessControl is AccessControl, ITimestampedAccessControl {
     // --- data
-    mapping(address => mapping(bytes32 => Timestamp)) watchkeeper;
+    mapping(address => mapping(bytes32 => Timestamp)) public watchkeeper;
 
     struct Timestamp {
         uint128 granted;
