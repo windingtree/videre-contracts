@@ -49,8 +49,7 @@ contract ServiceProviderRegistry is IServiceProviderRegistry, AbstractTimestampe
     ) public view returns (bool) {
         // @dev write role can be admins, apis, or managers.
         if (what == Role.WRITE) {
-            return (hasRole(_calcRole(which, Role.WRITE), who) ||
-                hasRole(_calcRole(which, Role.MANAGER), who) ||
+            return (hasRole(_calcRole(which, Role.MANAGER), who) ||
                 hasRole(_calcRole(which, Role.API), who) ||
                 hasRole(_calcRole(which, Role.ADMIN), who));
         } else {
@@ -89,7 +88,6 @@ contract ServiceProviderRegistry is IServiceProviderRegistry, AbstractTimestampe
         _setRoleAdmin(_calcRole(provider, Role.BIDDER), adminRole);
         _setRoleAdmin(_calcRole(provider, Role.MANAGER), adminRole);
         _setRoleAdmin(_calcRole(provider, Role.STAFF), adminRole);
-        _setRoleAdmin(_calcRole(provider, Role.WRITE), adminRole);
 
         emit ServiceProviderRegistered(provider, _msgSender());
     }
