@@ -112,7 +112,6 @@ contract LineRegistry is ILineRegistry, Context {
 
     /// @inheritdoc ILineRegistry
     function register(bytes32 line, bytes32 which) public enabled onlyServiceProviderAdmin(which) {
-        require(serviceProviderRegistry.exists(which), 'registry/no-such-provider');
         require(exists(line), 'registry/no-such-line');
         gatekeeper[line][which] = 1;
     }
@@ -121,7 +120,6 @@ contract LineRegistry is ILineRegistry, Context {
     /// @dev Irrespective, all vouchers issued will remain valid per their terms
     /// @dev does not check if a line exists beforehand!
     function deregister(bytes32 line, bytes32 which) public onlyServiceProviderAdmin(which) {
-        require(serviceProviderRegistry.exists(which), 'registry/no-such-provider');
         gatekeeper[line][which] = 0;
     }
 }
