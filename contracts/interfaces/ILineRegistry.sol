@@ -48,7 +48,7 @@ interface ILineRegistry {
     // --- getters
     /// @notice Protocol fee levied on industrial line
     /// @param line of industry for protocol fee
-    /// @return protocol fee levied in milli basis points
+    /// @return protocol fee levied in to 27 decimal places
     function cut(bytes32 line) external view returns (uint256);
 
     /// @notice Pointer to the industry-specific terms contract.

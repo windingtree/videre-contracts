@@ -58,6 +58,8 @@ contract LineRegistry is ILineRegistry, Context {
     // --- data
     IServiceProviderRegistry public serviceProviderRegistry;
 
+    uint256 private constant ONE = 10**27;
+
     struct Line {
         address terms;
         uint96 cut;
@@ -101,7 +103,12 @@ contract LineRegistry is ILineRegistry, Context {
         uint256 data
     ) external auth {
         if (what == 'self_register') selfRegister = data;
-        else if (what == 'cut') lines[line].cut = uint96(data);
+        else if (what == 'cut') {
+            Line storage _line = lines[line];
+            require(_line.terms != address(0), 'registry/line-not-exist');
+            require(data < ONE, 'registry/invalid-cut');
+            _line.cut = uint96(data);
+        }
         else revert('registry/file-unrecognized-param');
     }
 
