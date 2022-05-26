@@ -7,7 +7,7 @@ import { expect } from './chai-setup'
 import { utils } from 'ethers'
 
 const setup = deployments.createFixture(async () => {
-  await deployments.fixture('MockERC20')
+  await deployments.fixture('Videre')
   const { deployer, alice, bob, carol } = await getNamedAccounts()
   const contracts = {
     erc20: (await ethers.getContract('MockERC20')) as IERC20
