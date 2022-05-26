@@ -129,7 +129,7 @@ contract LineRegistry is ILineRegistry, Context {
     }
 
     /// @inheritdoc ILineRegistry
-    /// @dev Irrespective, all vouchers issued will remain valid per their terms
+    /// @dev Irrespective, all stubs issued will remain valid per their terms
     /// @dev does not check if a line exists beforehand!
     function deregister(bytes32 line, bytes32 which) public onlyServiceProviderAdmin(which) {
         gatekeeper[line][which] = 0;
