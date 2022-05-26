@@ -10,7 +10,7 @@ const STUB_1 = utils.keccak256(utils.toUtf8Bytes('Stub1'))
 const STUB_2 = utils.keccak256(utils.toUtf8Bytes('Stub2'))
 
 const setup = deployments.createFixture(async () => {
-  await deployments.fixture('LineRegistry')
+  await deployments.fixture('Videre')
   const { deployer, alice, bob, manager, staff } = await getNamedAccounts()
   const contracts = {
     vat: (await ethers.getContract('Vat')) as Vat,
