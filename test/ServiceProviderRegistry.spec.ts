@@ -16,7 +16,7 @@ const STAFF_ROLE = 4
 const ROLES = [API_ROLE, BIDDER_ROLE, MANAGER_ROLE, STAFF_ROLE]
 
 const setup = deployments.createFixture(async () => {
-  await deployments.fixture('ServiceProviderRegistry')
+  await deployments.fixture('Videre')
   const { deployer, alice, bob, manager, staff } = await getNamedAccounts()
   const contracts = {
     spRegistry: (await ethers.getContract('ServiceProviderRegistry')) as ServiceProviderRegistry

@@ -11,7 +11,7 @@ const WHITELIST_ROLE = utils.keccak256(utils.toUtf8Bytes('videre.roles.whitelist
 const MANAGER_ROLE = 3
 
 const setup = deployments.createFixture(async () => {
-  await deployments.fixture('LineRegistry')
+  await deployments.fixture('Videre')
   const { deployer, alice, bob, manager, staff } = await getNamedAccounts()
   const contracts = {
     lRegistry: (await ethers.getContract('LineRegistry')) as LineRegistry,

@@ -7,7 +7,7 @@ import { utils } from 'ethers'
 import { ITimestampRegistry } from '../typechain'
 
 const setup = deployments.createFixture(async () => {
-  await deployments.fixture('TimestampRegistry')
+  await deployments.fixture('Videre')
   const { deployer } = await getNamedAccounts()
   const contracts = {
     tsRegistry: (await ethers.getContract('TimestampRegistry')) as ITimestampRegistry
