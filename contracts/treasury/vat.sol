@@ -176,6 +176,8 @@ contract Vat {
         require(live == 1, 'Vat/not-live');
         // protocol fee isn't higher than amount
         require(fee <= wad, 'Vat/fee-too-high');
+        // make sure there's enough funds to be moved
+        require(wad <= bags[src][gem], 'Vat/insufficient-funds');
 
         address i = msg.sender;
 
@@ -203,6 +205,8 @@ contract Vat {
         require(live == 1, 'Vat/not-live');
         // protocol fee isn't higher than amount
         require(fee <= wad, 'Vat/fee-too-high');
+        // make sure enough funds to be sucked
+        require(wad <= bags[src][gem], 'Vat/insufficient-funds');
 
         address i = msg.sender;
 
