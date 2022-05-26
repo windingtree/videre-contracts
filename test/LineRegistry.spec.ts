@@ -31,27 +31,21 @@ const setup = deployments.createFixture(async () => {
 })
 
 describe('LineRegistry', function () {
-  // let users: ({ address: string } & { erc20: IERC20 })[]
   let deployer: { address: string } & { lRegistry: LineRegistry, spRegistry: ServiceProviderRegistry }
   let alice: { address: string } & { lRegistry: LineRegistry, spRegistry: ServiceProviderRegistry }
   let bob: { address: string } & { lRegistry: LineRegistry, spRegistry: ServiceProviderRegistry }
   let manager: { address: string } & { lRegistry: LineRegistry, spRegistry: ServiceProviderRegistry }
-  let staff: { address: string } & { lRegistry: LineRegistry, spRegistry: ServiceProviderRegistry }
 
   const SP_SALT = utils.keccak256(utils.toUtf8Bytes('salt'))
   const SP_URI = 'some_uri'
-  let serviceProviderId: string
 
   beforeEach('load fixture', async () => {
     // eslint-disable-next-line @typescript-eslint/no-extra-semi
-    ;({ deployer, alice, bob, manager, staff } = await setup())
+    ;({ deployer, alice, bob, manager } = await setup())
 
     // give bob the whitelist role so he may register his service
     await deployer.spRegistry.grantRole(WHITELIST_ROLE, deployer.address)
     await deployer.spRegistry.grantRole(WHITELIST_ROLE, bob.address)
-
-    // record what the service provider id will be
-    // serviceProviderId = await bob.spRegistry.callStatic.enroll(SP_SALT, SP_URI)
   })
 
   context('Protocol Governance', async () => {

@@ -24,7 +24,6 @@ const setup = deployments.createFixture(async () => {
 })
 
 describe('Hash Library', function () {
-  // let users: ({ address: string } & { erc20: IERC20 })[]
   let deployer: { address: string } & { hashlib: HashLib }
   let bid: any
   let stub: any

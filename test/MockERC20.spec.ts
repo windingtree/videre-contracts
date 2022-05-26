@@ -25,7 +25,6 @@ const setup = deployments.createFixture(async () => {
 })
 
 describe('MockERC20', function () {
-  // let users: ({ address: string } & { erc20: IERC20 })[]
   let deployer: { address: string } & { erc20: MockERC20 }
   let alice: { address: string } & { erc20: MockERC20 }
   let bob: { address: string } & { erc20: MockERC20 }
