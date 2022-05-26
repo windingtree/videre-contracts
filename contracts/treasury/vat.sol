@@ -123,6 +123,8 @@ contract Vat {
         require(live == 1, 'Vat/not-live');
         // stub does not exist
         require(both(bags[stub][gem] == 0, owns[stub] == address(0)), 'Vat/stub-exists');
+        // user must not be zero address
+        require(usr != address(0), 'Vat/invalid-usr');
         // user has enough funds to pay
         require(gems[usr][gem] >= wad, 'Vat/insufficient-funds');
         // protocol fee isn't higher than cost
@@ -151,6 +153,8 @@ contract Vat {
         require(live == 1, 'Vat/not-live');
         // stub owner is correct
         require(owns[stub] == src, 'Vat/not-allowed');
+        // dst must not be zero address
+        require(dst != address(0), 'Vat/invalid-dst');
         // user has enough funds to pay
         require(gems[dst][gem] >= wad, 'Vat/insufficient-funds');
         // protocol fee isn't higher than cost
@@ -178,6 +182,9 @@ contract Vat {
         require(fee <= wad, 'Vat/fee-too-high');
         // make sure there's enough funds to be moved
         require(wad <= bags[src][gem], 'Vat/insufficient-funds');
+        // cannot move capital from service provider
+        // (a service provider has no owner)
+        require(owns[src] != address(0), 'Vat/not-stub');
 
         address i = msg.sender;
 
@@ -189,7 +196,7 @@ contract Vat {
 
         // cleanup
         if (bags[src][gem] == 0) {
-            if (owns[src] != address(0)) delete owns[src];
+            delete owns[src];
             delete bags[src][gem];
         }
     }
@@ -207,6 +214,8 @@ contract Vat {
         require(fee <= wad, 'Vat/fee-too-high');
         // make sure enough funds to be sucked
         require(wad <= bags[src][gem], 'Vat/insufficient-funds');
+        // make sure it is a service provider (ie. no owns)
+        require(owns[src] == address(0), 'Vat/not-service-provider');
 
         address i = msg.sender;
 
