@@ -23,9 +23,9 @@ library LibVidere {
         keccak256(
             'Bid(bytes32 salt,uint128 limit,uint128 expiry,bytes32 which,bytes32 params,bytes32[] items,BidTerm[] terms,BidOptions options,ERC20Native[] cost)BidOptionItem(bytes32 item,ERC20Native[] cost)BidOptionTerm(BidTerm term,ERC20Native[] cost)BidOptions(BidOptionItem[] items,BidOptionTerm[] terms)BidTerm(bytes32 term,address impl,bytes txPayload)ERC20Native(address gem,uint256 wad)'
         );
-    bytes32 private constant VOUCHER_STATE_TYPEHASH =
+    bytes32 private constant STUB_STATE_TYPEHASH =
         keccak256(
-            'VoucherState(bytes32 which,bytes32 params,bytes32[] items,BidTerm[] terms,ERC20Native cost)BidTerm(bytes32 term,address impl,bytes txPayload)ERC20Native(address gem,uint256 wad)'
+            'StubState(bytes32 which,bytes32 params,bytes32[] items,BidTerm[] terms,ERC20Native cost)BidTerm(bytes32 term,address impl,bytes txPayload)ERC20Native(address gem,uint256 wad)'
         );
 
     // --- ERC20 Native messages
@@ -158,8 +158,8 @@ library LibVidere {
             );
     }
 
-    // --- Voucher state
-    struct VoucherState {
+    // --- Stub state
+    struct StubState {
         bytes32 which;
         bytes32 params;
         bytes32[] items;
@@ -167,17 +167,17 @@ library LibVidere {
         ERC20Native cost;
     }
 
-    struct VoucherStorage {
+    struct StubStorage {
         bytes32 provider; // facility
-        bytes32 state; // eip712 signed hash of voucher's state
-        uint256 step; // what step in the lifecycle the voucher is at
+        bytes32 state; // eip712 signed hash of stub's state
+        uint256 step; // what step in the lifecycle the stub is at
         mapping(address => bytes) terms; // term => 1/0 or payload
     }
 
-    function hash(VoucherState memory a) internal pure returns (bytes32) {
+    function hash(StubState memory a) internal pure returns (bytes32) {
         return
             keccak256(
-                abi.encode(VOUCHER_STATE_TYPEHASH, a.which, a.params, hash(a.items), hash(a.terms), hash(a.cost))
+                abi.encode(STUB_STATE_TYPEHASH, a.which, a.params, hash(a.items), hash(a.terms), hash(a.cost))
             );
     }
 

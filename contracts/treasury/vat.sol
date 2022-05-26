@@ -39,10 +39,10 @@ contract Vat {
     }
 
     // --- data
-    mapping(bytes32 => mapping(address => uint256)) public bags; // [wad] - providers & vouchers
+    mapping(bytes32 => mapping(address => uint256)) public bags; // [wad] - providers & stubs
     mapping(address => mapping(address => uint256)) public gems; // [wad] - depositors (providers & consumers)
 
-    mapping(bytes32 => address) public owns; // owners of vouchers
+    mapping(bytes32 => address) public owns; // owners of stubs
 
     uint256 public live; // Active flag
 
@@ -111,7 +111,7 @@ contract Vat {
         gems[dst][gem] = gems[dst][gem] + wad;
     }
 
-    // --- Voucher Handling
+    // --- Stub Handling
     function deal(
         bytes32 stub,
         address usr,
@@ -121,8 +121,8 @@ contract Vat {
     ) external auth {
         // system is live
         require(live == 1, 'Vat/not-live');
-        // voucher does not exist
-        require(both(bags[stub][gem] == 0, owns[stub] == address(0)), 'Vat/voucher-exists');
+        // stub does not exist
+        require(both(bags[stub][gem] == 0, owns[stub] == address(0)), 'Vat/stub-exists');
         // user has enough funds to pay
         require(gems[usr][gem] >= wad, 'Vat/insufficient-funds');
         // protocol fee isn't higher than cost
@@ -130,12 +130,12 @@ contract Vat {
 
         address i = msg.sender; // the industry
 
-        uint256 net = _sub(wad, fee); // calculate net voucher cost
+        uint256 net = _sub(wad, fee); // calculate net stub cost
         gems[usr][gem] = _sub(gems[usr][gem], wad); // deduct user's account
-        bags[stub][gem] = net; // capitalise the voucher
+        bags[stub][gem] = net; // capitalise the stub
         gems[i][gem] += fee; // pay the protocol fee
 
-        owns[stub] = usr; // set the voucher's owner
+        owns[stub] = usr; // set the stub's owner
     }
 
     // --- Stub fungibility
@@ -149,19 +149,19 @@ contract Vat {
     ) external auth {
         // system is live
         require(live == 1, 'Vat/not-live');
-        // voucher owner is correct
+        // stub owner is correct
         require(owns[stub] == src, 'Vat/not-allowed');
         // user has enough funds to pay
         require(gems[dst][gem] >= wad, 'Vat/insufficient-funds');
         // protocol fee isn't higher than cost
         require(fee <= wad, 'Vat/fee-too-high');
 
-        uint256 net = _sub(wad, fee); // calculate net voucher cost
+        uint256 net = _sub(wad, fee); // calculate net stub cost
         gems[dst][gem] = _sub(gems[dst][gem], wad); // deduct user's account
         gems[src][gem] += net; // pay the seller
-        bags[stub][gem] += fee; // add capital to the voucher
+        bags[stub][gem] += fee; // add capital to the stub
 
-        owns[stub] = dst; // set the voucher's owner
+        owns[stub] = dst; // set the stub's owner
     }
 
     // --- Stub settlement
