@@ -258,16 +258,4 @@ library LibVidere {
         }
         require(found == 1, 'LibVidere/gem-not-found');
     }
-
-    function gemCost(address gem, ERC20Native[] memory costs) internal pure returns (ERC20Native memory cost) {
-        uint256 found;
-        for (uint256 i = 0; i < costs.length; i++) {
-            if (costs[i].gem == gem) {
-                found = 1;
-                cost = costs[i];
-                break;
-            }
-        }
-        require(found == 1, 'LibVidere/gem-not-found');
-    }
 }
