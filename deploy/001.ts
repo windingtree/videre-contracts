@@ -47,6 +47,12 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     autoMine: true
   })
 
+  const hashlibDeploy = await deploy('HashLib', {
+    from: deployer,
+    log: true,
+    autoMine: true
+  })
+
   const gemJoinDeploy = await deploy('GemJoin', {
     from: deployer,
     log: true,
