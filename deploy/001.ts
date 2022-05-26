@@ -6,16 +6,10 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { deployments, getNamedAccounts } = hre
   const { deploy } = deployments
 
-  const { deployer, alice, bob, carol } = await getNamedAccounts()
-
-  // --- Account listing ---
-  console.log(`Deployer: ${deployer}`)
-  console.log(`Alice: ${alice}`)
-  console.log(`Bob: ${bob}`)
-  console.log(`Carol: ${carol}`)
+  const { deployer } = await getNamedAccounts()
 
   // --- Deploy the registries
-  const timestampRegistryDeploy = await deploy('TimestampRegistry', {
+  await deploy('TimestampRegistry', {
     from: deployer,
     log: true,
     autoMine: true
@@ -28,7 +22,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     args: [Number(60 * 60 * 24 * 180).toString()]
   })
 
-  const lineRegistryDeploy = await deploy('LineRegistry', {
+  await deploy('LineRegistry', {
     from: deployer,
     log: true,
     autoMine: true,
@@ -47,13 +41,13 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     autoMine: true
   })
 
-  const hashlibDeploy = await deploy('HashLib', {
+  await deploy('HashLib', {
     from: deployer,
     log: true,
     autoMine: true
   })
 
-  const gemJoinDeploy = await deploy('GemJoin', {
+  await deploy('GemJoin', {
     from: deployer,
     log: true,
     autoMine: true,
@@ -67,4 +61,4 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 }
 
 export default func
-func.tags = ['Videre', 'TimestampRegistry', 'ServiceProviderRegistry', 'LineRegistry']
+func.tags = ['Videre']
