@@ -54,11 +54,11 @@ library LibVidere {
     struct BidTerm {
         bytes32 term;
         address impl;
-        bytes payload;
+        bytes txPayload;
     }
 
     function hash(BidTerm memory a) internal pure returns (bytes32) {
-        return keccak256(abi.encode(BIDTERM_TYPEHASH, a.term, a.impl, keccak256(a.payload)));
+        return keccak256(abi.encode(BIDTERM_TYPEHASH, a.term, a.impl, keccak256(a.txPayload)));
     }
 
     // arrays
