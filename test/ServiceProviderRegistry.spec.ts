@@ -35,7 +35,6 @@ const setup = deployments.createFixture(async () => {
 })
 
 describe('ServiceProviderRegistry', function () {
-  // let users: ({ address: string } & { erc20: IERC20 })[]
   let deployer: { address: string } & { spRegistry: ServiceProviderRegistry }
   let alice: { address: string } & { spRegistry: ServiceProviderRegistry }
   let bob: { address: string } & { spRegistry: ServiceProviderRegistry }

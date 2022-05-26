@@ -22,7 +22,6 @@ const setup = deployments.createFixture(async () => {
 })
 
 describe('TimestampRegistry', function () {
-  // let users: ({ address: string } & { erc20: IERC20 })[]
   let deployer: { address: string } & { tsRegistry: ITimestampRegistry }
   const hash = utils.keccak256(utils.toUtf8Bytes('TEST'))
 
