@@ -7,12 +7,6 @@ import {SignatureChecker} from '@openzeppelin/contracts/utils/cryptography/Signa
 
 interface VatLike {
     function slip(
-        bytes32,
-        address,
-        int256
-    ) external;
-
-    function slip(
         address,
         address,
         int256
