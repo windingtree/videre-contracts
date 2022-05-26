@@ -161,7 +161,7 @@ describe('Vat', function () {
 
   /**
    * Allow an authorized module to change the amount of tokens held by
-   * a 'bytes32' account (ie. service provider, or voucher).
+   * a 'bytes32' account (ie. service provider, or stub).
    *
    * Only checks performed here are basic math to make sure there is no
    * underflow / overflow for int256.
