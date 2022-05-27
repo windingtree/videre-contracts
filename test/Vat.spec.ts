@@ -31,9 +31,9 @@ const setup = deployments.createFixture(async () => {
 })
 
 describe('Vat', function () {
-  let deployer: { address: string } & { vat: Vat, erc20: MockERC20 }
-  let alice: { address: string } & { vat: Vat, erc20: MockERC20 }
-  let bob: { address: string } & { vat: Vat, erc20: MockERC20 }
+  let deployer: { address: string } & { vat: Vat; erc20: MockERC20 }
+  let alice: { address: string } & { vat: Vat; erc20: MockERC20 }
+  let bob: { address: string } & { vat: Vat; erc20: MockERC20 }
 
   beforeEach('load fixture', async () => {
     // eslint-disable-next-line @typescript-eslint/no-extra-semi
@@ -45,8 +45,7 @@ describe('Vat', function () {
       expect(await deployer.vat.wards(deployer.address)).to.be.eq(1)
     })
     it('rely is guarded', async () => {
-      await expect(alice.vat.rely(alice.address))
-        .to.be.revertedWith('Vat/not-authorized')
+      await expect(alice.vat.rely(alice.address)).to.be.revertedWith('Vat/not-authorized')
     })
     it('can rely', async () => {
       expect(await deployer.vat.wards(alice.address)).to.be.eq(0)
@@ -54,14 +53,12 @@ describe('Vat', function () {
       expect(await deployer.vat.wards(alice.address)).to.be.eq(1)
     })
     it('deny is guarded', async () => {
-      await expect(alice.vat.deny(deployer.address))
-        .to.be.revertedWith('Vat/not-authorized')
+      await expect(alice.vat.deny(deployer.address)).to.be.revertedWith('Vat/not-authorized')
     })
     it('can deny', async () => {
       await deployer.vat.rely(alice.address)
       const status = await deployer.vat.wards(alice.address)
-      await expect(alice.vat.deny(alice.address))
-        .to.not.be.reverted
+      await expect(alice.vat.deny(alice.address)).to.not.be.reverted
       expect(await alice.vat.wards(alice.address)).to.be.eq(status.sub(1))
     })
     it('protects against liveliness', async () => {
@@ -69,10 +66,8 @@ describe('Vat', function () {
       expect(await deployer.vat.live()).to.be.eq(1)
       await expect(deployer.vat.cage()).to.not.be.reverted
       expect(await deployer.vat.live()).to.be.eq(0)
-      await expect(deployer.vat.rely(alice.address))
-        .to.be.revertedWith('Vat/not-live')
-      await expect(deployer.vat.deny(alice.address))
-        .to.be.revertedWith('Vat/not-live')
+      await expect(deployer.vat.rely(alice.address)).to.be.revertedWith('Vat/not-live')
+      await expect(deployer.vat.deny(alice.address)).to.be.revertedWith('Vat/not-live')
     })
   })
 
@@ -105,11 +100,7 @@ describe('Vat', function () {
   context('#slip', async () => {
     it('is guarded', async () => {
       await expect(
-        alice.vat['slip(address,address,int256)'](
-          alice.address,
-          alice.erc20.address,
-          utils.parseEther('10000')
-        )
+        alice.vat['slip(address,address,int256)'](alice.address, alice.erc20.address, utils.parseEther('10000'))
       ).to.be.revertedWith('Vat/not-authorized')
     })
     it('protected against overflow / underflow', async () => {
@@ -124,32 +115,16 @@ describe('Vat', function () {
           BigNumber.from('57896044618658097711785492504343953926634992332820282019728792003956564819967')
         )
       }
-      await deployer.vat['slip(address,address,int256)'](
-        alice.address,
-        alice.erc20.address,
-        1
-      )
+      await deployer.vat['slip(address,address,int256)'](alice.address, alice.erc20.address, 1)
 
       const balance = await alice.vat.gems(alice.address, alice.erc20.address)
       // attempt the overflow
-      await expect(
-        deployer.vat['slip(address,address,int256)'](
-          alice.address,
-          alice.erc20.address,
-          1
-        )
-      ).to.be.reverted
+      await expect(deployer.vat['slip(address,address,int256)'](alice.address, alice.erc20.address, 1)).to.be.reverted
 
       expect(await alice.vat.gems(alice.address, alice.erc20.address)).to.be.eq(balance)
 
       // underflow
-      await expect(
-        deployer.vat['slip(address,address,int256)'](
-          bob.address,
-          bob.erc20.address,
-          -1
-        )
-      ).to.be.reverted
+      await expect(deployer.vat['slip(address,address,int256)'](bob.address, bob.erc20.address, -1)).to.be.reverted
       expect(await bob.vat.gems(bob.address, bob.erc20.address)).to.be.eq(0)
     })
     it('can add to an account', async () => {
@@ -178,11 +153,7 @@ describe('Vat', function () {
   context('#slip', async () => {
     it('is guarded', async () => {
       await expect(
-        alice.vat['slip(bytes32,address,int256)'](
-          STUB_1,
-          alice.erc20.address,
-          utils.parseEther('10000')
-        )
+        alice.vat['slip(bytes32,address,int256)'](STUB_1, alice.erc20.address, utils.parseEther('10000'))
       ).to.be.revertedWith('Vat/not-authorized')
     })
     it('protected against overflow / underflow', async () => {
@@ -197,32 +168,16 @@ describe('Vat', function () {
           BigNumber.from('57896044618658097711785492504343953926634992332820282019728792003956564819967')
         )
       }
-      await deployer.vat['slip(bytes32,address,int256)'](
-        STUB_1,
-        deployer.erc20.address,
-        1
-      )
+      await deployer.vat['slip(bytes32,address,int256)'](STUB_1, deployer.erc20.address, 1)
 
       const balance = await deployer.vat.bags(STUB_1, deployer.erc20.address)
       // attempt the overflow
-      await expect(
-        deployer.vat['slip(bytes32,address,int256)'](
-          STUB_1,
-          deployer.erc20.address,
-          1
-        )
-      ).to.be.reverted
+      await expect(deployer.vat['slip(bytes32,address,int256)'](STUB_1, deployer.erc20.address, 1)).to.be.reverted
 
       expect(await deployer.vat.bags(STUB_1, deployer.erc20.address)).to.be.eq(balance)
 
       // underflow
-      await expect(
-        deployer.vat['slip(bytes32,address,int256)'](
-          STUB_2,
-          deployer.erc20.address,
-          -1
-        )
-      ).to.be.reverted
+      await expect(deployer.vat['slip(bytes32,address,int256)'](STUB_2, deployer.erc20.address, -1)).to.be.reverted
       expect(await deployer.vat.bags(STUB_2, deployer.erc20.address)).to.be.eq(0)
     })
     it('can add to an account', async () => {
@@ -250,67 +205,40 @@ describe('Vat', function () {
   context('#flux', async () => {
     beforeEach('make deposit for alice', async () => {
       // use slip for the deposit
-      await deployer.vat['slip(address,address,int256)'](
-        alice.address,
-        alice.erc20.address,
-        utils.parseEther('100')
-      )
+      await deployer.vat['slip(address,address,int256)'](alice.address, alice.erc20.address, utils.parseEther('100'))
     })
 
     it('can transfer from alice to bob', async () => {
       const aliceBalance = await alice.vat.gems(alice.address, alice.erc20.address)
       const bobBalance = await bob.vat.gems(bob.address, bob.erc20.address)
       // transfer from alice to bob
-      await alice.vat.flux(
-        alice.address,
-        bob.address,
-        alice.erc20.address,
-        utils.parseEther('100')
+      await alice.vat.flux(alice.address, bob.address, alice.erc20.address, utils.parseEther('100'))
+      expect(await alice.vat.gems(alice.address, alice.erc20.address)).to.be.eq(
+        aliceBalance.sub(utils.parseEther('100'))
       )
-      expect(await alice.vat.gems(alice.address, alice.erc20.address))
-        .to.be.eq(aliceBalance.sub(utils.parseEther('100')))
-      expect(await bob.vat.gems(bob.address, bob.erc20.address))
-        .to.be.eq(bobBalance.add(utils.parseEther('100')))
+      expect(await bob.vat.gems(bob.address, bob.erc20.address)).to.be.eq(bobBalance.add(utils.parseEther('100')))
     })
 
     it('cannot flux more than is in src account to own account', async () => {
-      await expect(alice.vat.flux(
-        alice.address,
-        bob.address,
-        alice.erc20.address,
-        utils.parseEther('150')
-      )).to.be.reverted
+      await expect(alice.vat.flux(alice.address, bob.address, alice.erc20.address, utils.parseEther('150'))).to.be
+        .reverted
     })
 
     it('can permit another user to flux your account', async () => {
-      const aliceBalance = await alice.vat.gems(
-        alice.address,
-        alice.erc20.address
-      )
-      const bobBalance = await bob.vat.gems(
-        bob.address,
-        bob.erc20.address
-      )
-      await expect(bob.vat.flux(
-        alice.address,
-        bob.address,
-        bob.erc20.address,
-        utils.parseEther('100')
-      )).to.be.revertedWith('Vat/not-allowed')
+      const aliceBalance = await alice.vat.gems(alice.address, alice.erc20.address)
+      const bobBalance = await bob.vat.gems(bob.address, bob.erc20.address)
+      await expect(
+        bob.vat.flux(alice.address, bob.address, bob.erc20.address, utils.parseEther('100'))
+      ).to.be.revertedWith('Vat/not-allowed')
       expect(await alice.vat.gems(alice.address, alice.erc20.address)).to.be.eq(aliceBalance)
       expect(await bob.vat.gems(bob.address, bob.erc20.address)).to.be.eq(bobBalance)
       // alice gives permission to bob to use her tokens
       await alice.vat.hope(bob.address)
-      await bob.vat.flux(
-        alice.address,
-        bob.address,
-        bob.erc20.address,
-        utils.parseEther('100')
+      await bob.vat.flux(alice.address, bob.address, bob.erc20.address, utils.parseEther('100'))
+      expect(await alice.vat.gems(alice.address, alice.erc20.address)).to.be.eq(
+        aliceBalance.sub(utils.parseEther('100'))
       )
-      expect(await alice.vat.gems(alice.address, alice.erc20.address))
-        .to.be.eq(aliceBalance.sub(utils.parseEther('100')))
-      expect(await bob.vat.gems(bob.address, bob.erc20.address))
-        .to.be.eq(bobBalance.add(utils.parseEther('100')))
+      expect(await bob.vat.gems(bob.address, bob.erc20.address)).to.be.eq(bobBalance.add(utils.parseEther('100')))
     })
   })
 
@@ -322,106 +250,57 @@ describe('Vat', function () {
   context('#deal', async () => {
     it('is guarded', async () => {
       await expect(
-        alice.vat.deal(
-          STUB_1,
-          alice.address,
-          alice.erc20.address,
-          utils.parseEther('100'),
-          0
-        )
+        alice.vat.deal(STUB_1, alice.address, alice.erc20.address, utils.parseEther('100'), 0)
       ).to.be.revertedWith('Vat/not-authorized')
     })
 
     it('cannot deal if not live', async () => {
       await deployer.vat.cage()
       await expect(
-        deployer.vat.deal(
-          STUB_1,
-          alice.address,
-          alice.erc20.address,
-          utils.parseEther('100'),
-          0
-        )
+        deployer.vat.deal(STUB_1, alice.address, alice.erc20.address, utils.parseEther('100'), 0)
       ).to.be.revertedWith('Vat/not-live')
     })
 
     it('must be a non zero address', async () => {
       await expect(
-        deployer.vat.deal(
-          STUB_1,
-          constants.AddressZero,
-          alice.erc20.address,
-          utils.parseEther('100'),
-          0
-        )
+        deployer.vat.deal(STUB_1, constants.AddressZero, alice.erc20.address, utils.parseEther('100'), 0)
       ).to.be.revertedWith('Vat/invalid-usr')
     })
 
     it('must have enough funds to pay', async () => {
       await expect(
-        deployer.vat.deal(
-          STUB_1,
-          alice.address,
-          alice.erc20.address,
-          utils.parseEther('100'),
-          0
-        )
+        deployer.vat.deal(STUB_1, alice.address, alice.erc20.address, utils.parseEther('100'), 0)
       ).to.be.revertedWith('Vat/insufficient-funds')
     })
 
     it('cannot have protocol fee higher than total cost', async () => {
       // add some funds to pay for the service
-      await deployer.vat['slip(address,address,int256)'](
-        alice.address,
-        alice.erc20.address,
-        utils.parseEther('100')
-      )
+      await deployer.vat['slip(address,address,int256)'](alice.address, alice.erc20.address, utils.parseEther('100'))
       await expect(
-        deployer.vat.deal(
-          STUB_1,
-          alice.address,
-          alice.erc20.address,
-          utils.parseEther('100'),
-          utils.parseEther('101')
-        )
+        deployer.vat.deal(STUB_1, alice.address, alice.erc20.address, utils.parseEther('100'), utils.parseEther('101'))
       ).to.be.revertedWith('Vat/fee-too-high')
     })
 
-    it('can make booking and not make the same booking twice', async() => {
+    it('can make booking and not make the same booking twice', async () => {
       // add some funds to pay for the service
-      await deployer.vat['slip(address,address,int256)'](
-        alice.address,
-        alice.erc20.address,
-        utils.parseEther('100')
-      )
+      await deployer.vat['slip(address,address,int256)'](alice.address, alice.erc20.address, utils.parseEther('100'))
       const balance = await alice.vat.gems(alice.address, alice.erc20.address)
-      await expect(deployer.vat.deal(
-        STUB_1,
-        alice.address,
-        alice.erc20.address,
-        utils.parseEther('100'),
-        utils.parseEther('10')
-      )).to.not.be.reverted
+      await expect(
+        deployer.vat.deal(STUB_1, alice.address, alice.erc20.address, utils.parseEther('100'), utils.parseEther('10'))
+      ).to.not.be.reverted
       // make sure that the total cost has been deducted from the purchaser
-      expect(await deployer.vat.gems(alice.address, alice.erc20.address))
-        .to.be.eq(balance.sub(utils.parseEther('100')))
+      expect(await deployer.vat.gems(alice.address, alice.erc20.address)).to.be.eq(balance.sub(utils.parseEther('100')))
       // make sure that the stub has been collateralised
-      expect(await deployer.vat.bags(STUB_1, alice.erc20.address))
-        .to.be.eq(utils.parseEther('90'))
+      expect(await deployer.vat.bags(STUB_1, alice.erc20.address)).to.be.eq(utils.parseEther('90'))
       // make sure that the protocol fee has been paid
-      expect(await deployer.vat.gems(deployer.address, alice.erc20.address))
-        .to.be.eq(utils.parseEther('10'))
+      expect(await deployer.vat.gems(deployer.address, alice.erc20.address)).to.be.eq(utils.parseEther('10'))
       // make sure that alice got her stub
       expect(await deployer.vat.owns(STUB_1)).to.be.eq(alice.address)
 
       // cannot register the same stub again
-      await expect(deployer.vat.deal(
-        STUB_1,
-        alice.address,
-        alice.erc20.address,
-        utils.parseEther('100'),
-        utils.parseEther('10')
-      )).to.be.revertedWith('Vat/stub-exists')
+      await expect(
+        deployer.vat.deal(STUB_1, alice.address, alice.erc20.address, utils.parseEther('100'), utils.parseEther('10'))
+      ).to.be.revertedWith('Vat/stub-exists')
     })
   })
 
@@ -439,17 +318,9 @@ describe('Vat', function () {
   context('#swap', async () => {
     beforeEach('alice makes a deal', async () => {
       // add some funds to pay for the service
-      await deployer.vat['slip(address,address,int256)'](
-        alice.address,
-        alice.erc20.address,
-        utils.parseEther('100')
-      )
+      await deployer.vat['slip(address,address,int256)'](alice.address, alice.erc20.address, utils.parseEther('100'))
       // bob will buy from alice so give him some dosh
-      await deployer.vat['slip(address,address,int256)'](
-        bob.address,
-        bob.erc20.address,
-        utils.parseEther('150')
-      )
+      await deployer.vat['slip(address,address,int256)'](bob.address, bob.erc20.address, utils.parseEther('150'))
       // make a deal that we can swap later
       await deployer.vat.deal(
         STUB_1,
@@ -461,72 +332,54 @@ describe('Vat', function () {
     })
 
     it('is guarded', async () => {
-      await expect(
-        alice.vat.swap(
-          STUB_1,
-          alice.address,
-          bob.address,
-          bob.erc20.address,
-          0,
-          0
-        )
-      ).to.be.revertedWith('Vat/not-authorized')
+      await expect(alice.vat.swap(STUB_1, alice.address, bob.address, bob.erc20.address, 0, 0)).to.be.revertedWith(
+        'Vat/not-authorized'
+      )
     })
 
     it('cannot swap if not live', async () => {
       await deployer.vat.cage()
-      await expect(deployer.vat.swap(
-        STUB_1,
-        alice.address,
-        bob.address,
-        bob.erc20.address,
-        0,
-        0
-      )).to.be.revertedWith('Vat/not-live')
+      await expect(deployer.vat.swap(STUB_1, alice.address, bob.address, bob.erc20.address, 0, 0)).to.be.revertedWith(
+        'Vat/not-live'
+      )
     })
 
     it('cannot move stub if src is not the owner', async () => {
-      await expect(deployer.vat.swap(
-        STUB_1,
-        bob.address,
-        bob.address,
-        bob.erc20.address,
-        0,
-        0
-      )).to.be.revertedWith('Vat/not-allowed')
+      await expect(deployer.vat.swap(STUB_1, bob.address, bob.address, bob.erc20.address, 0, 0)).to.be.revertedWith(
+        'Vat/not-allowed'
+      )
     })
 
     it('bob must have enough to pay', async () => {
-      await expect(deployer.vat.swap(
-        STUB_1,
-        alice.address,
-        bob.address,
-        bob.erc20.address,
-        utils.parseEther('160'),
-        0
-      )).to.be.revertedWith('Vat/insufficient-funds')
+      await expect(
+        deployer.vat.swap(STUB_1, alice.address, bob.address, bob.erc20.address, utils.parseEther('160'), 0)
+      ).to.be.revertedWith('Vat/insufficient-funds')
     })
 
     it('cannot charge more fees than cost', async () => {
-      await expect(deployer.vat.swap(
-        STUB_1,
-        alice.address,
-        bob.address,
-        bob.erc20.address,
-        utils.parseEther('150'),
-        utils.parseEther('160')
-      )).to.be.revertedWith('Vat/fee-too-high')
+      await expect(
+        deployer.vat.swap(
+          STUB_1,
+          alice.address,
+          bob.address,
+          bob.erc20.address,
+          utils.parseEther('150'),
+          utils.parseEther('160')
+        )
+      ).to.be.revertedWith('Vat/fee-too-high')
     })
 
     it('cannot send to zero address', async () => {
-      await expect(deployer.vat.swap(
-        STUB_1,
-        alice.address,
-        constants.AddressZero,
-        deployer.erc20.address,
-        utils.parseEther('150'),
-        0
-      )).to.be.revertedWith('Vat/invalid-dst')
+      await expect(
+        deployer.vat.swap(
+          STUB_1,
+          alice.address,
+          constants.AddressZero,
+          deployer.erc20.address,
+          utils.parseEther('150'),
+          0
+        )
+      ).to.be.revertedWith('Vat/invalid-dst')
     })
 
     it('can swap from alice to bob', async () => {
@@ -586,11 +439,7 @@ describe('Vat', function () {
   context('#move', async () => {
     beforeEach('alice makes a deal', async () => {
       // add some funds to pay for the service
-      await deployer.vat['slip(address,address,int256)'](
-        alice.address,
-        alice.erc20.address,
-        utils.parseEther('100')
-      )
+      await deployer.vat['slip(address,address,int256)'](alice.address, alice.erc20.address, utils.parseEther('100'))
       // make a deal that we can settle later
       await deployer.vat.deal(
         STUB_1,
@@ -603,35 +452,27 @@ describe('Vat', function () {
 
     it('is guarded', async () => {
       await expect(
-        alice.vat.move(
-          STUB_1,
-          SERVICE_PROVIDER_1,
-          bob.erc20.address,
-          utils.parseEther('100'),
-          0
-        )
+        alice.vat.move(STUB_1, SERVICE_PROVIDER_1, bob.erc20.address, utils.parseEther('100'), 0)
       ).to.be.revertedWith('Vat/not-authorized')
     })
 
     it('cannot move if not live', async () => {
       await deployer.vat.cage()
-      await expect(deployer.vat.move(
-        STUB_1,
-        SERVICE_PROVIDER_1,
-        alice.erc20.address,
-        utils.parseEther('100'),
-        0
-      )).to.be.revertedWith('Vat/not-live')
+      await expect(
+        deployer.vat.move(STUB_1, SERVICE_PROVIDER_1, alice.erc20.address, utils.parseEther('100'), 0)
+      ).to.be.revertedWith('Vat/not-live')
     })
 
     it('cannot charge more fees than cost', async () => {
-      await expect(deployer.vat.move(
-        STUB_1,
-        SERVICE_PROVIDER_1,
-        alice.erc20.address,
-        utils.parseEther('100'),
-        utils.parseEther('110')
-      )).to.be.revertedWith('Vat/fee-too-high')
+      await expect(
+        deployer.vat.move(
+          STUB_1,
+          SERVICE_PROVIDER_1,
+          alice.erc20.address,
+          utils.parseEther('100'),
+          utils.parseEther('110')
+        )
+      ).to.be.revertedWith('Vat/fee-too-high')
     })
 
     it('src must NOT be a service provider', async () => {
@@ -646,18 +487,12 @@ describe('Vat', function () {
       const sp2Balance = await deployer.vat.bags(SERVICE_PROVIDER_2, deployer.erc20.address)
 
       // try use 'move' to send funds between service providers
-      await expect(deployer.vat.move(
-        SERVICE_PROVIDER_2,
-        SERVICE_PROVIDER_1,
-        alice.erc20.address,
-        utils.parseEther('100'),
-        0
-      )).to.be.revertedWith('Vat/not-stub')
+      await expect(
+        deployer.vat.move(SERVICE_PROVIDER_2, SERVICE_PROVIDER_1, alice.erc20.address, utils.parseEther('100'), 0)
+      ).to.be.revertedWith('Vat/not-stub')
 
-      expect(await deployer.vat.bags(SERVICE_PROVIDER_1, deployer.erc20.address))
-        .to.be.eq(sp1Balance)
-      expect(await deployer.vat.bags(SERVICE_PROVIDER_2, deployer.erc20.address))
-        .to.be.eq(sp2Balance)
+      expect(await deployer.vat.bags(SERVICE_PROVIDER_1, deployer.erc20.address)).to.be.eq(sp1Balance)
+      expect(await deployer.vat.bags(SERVICE_PROVIDER_2, deployer.erc20.address)).to.be.eq(sp2Balance)
     })
 
     it('cannot settle more than what is in the stub', async () => {
@@ -665,37 +500,23 @@ describe('Vat', function () {
       const spBalance = await deployer.vat.bags(SERVICE_PROVIDER_1, deployer.erc20.address)
 
       // try overflow and get more money from stub than exists
-      await expect(deployer.vat.move(
-        STUB_1,
-        SERVICE_PROVIDER_1,
-        deployer.erc20.address,
-        stubBalance.mul(2),
-        0
-      )).to.be.revertedWith('Vat/insufficient-funds')
+      await expect(
+        deployer.vat.move(STUB_1, SERVICE_PROVIDER_1, deployer.erc20.address, stubBalance.mul(2), 0)
+      ).to.be.revertedWith('Vat/insufficient-funds')
 
-      expect(await deployer.vat.bags(STUB_1, deployer.erc20.address))
-        .to.be.eq(stubBalance)
-      expect(await deployer.vat.bags(SERVICE_PROVIDER_1, deployer.erc20.address))
-        .to.be.eq(spBalance)
+      expect(await deployer.vat.bags(STUB_1, deployer.erc20.address)).to.be.eq(stubBalance)
+      expect(await deployer.vat.bags(SERVICE_PROVIDER_1, deployer.erc20.address)).to.be.eq(spBalance)
     })
 
     it('can partially settle stubs', async () => {
-      await deployer.vat.move(
-        STUB_1,
-        SERVICE_PROVIDER_1,
-        deployer.erc20.address,
-        utils.parseEther('80'),
-        0
-      )
+      await deployer.vat.move(STUB_1, SERVICE_PROVIDER_1, deployer.erc20.address, utils.parseEther('80'), 0)
 
       // make sure there's something left over
-      expect(await deployer.vat.bags(STUB_1, deployer.erc20.address))
-        .to.be.eq(utils.parseEther('10'))
+      expect(await deployer.vat.bags(STUB_1, deployer.erc20.address)).to.be.eq(utils.parseEther('10'))
       // make sure ownership of the stub is preserved
       expect(await deployer.vat.owns(STUB_1)).to.be.eq(alice.address)
       // make sure that the service provider got partial settlement
-      expect(await deployer.vat.bags(SERVICE_PROVIDER_1, deployer.erc20.address))
-        .to.be.eq(utils.parseEther('80'))
+      expect(await deployer.vat.bags(SERVICE_PROVIDER_1, deployer.erc20.address)).to.be.eq(utils.parseEther('80'))
     })
 
     it('can settle the stub', async () => {
@@ -706,13 +527,7 @@ describe('Vat', function () {
 
       const fee = stubBalance.mul(10).div(100) // 10%
 
-      await deployer.vat.move(
-        STUB_1,
-        SERVICE_PROVIDER_1,
-        deployer.erc20.address,
-        stubBalance,
-        fee
-      )
+      await deployer.vat.move(STUB_1, SERVICE_PROVIDER_1, deployer.erc20.address, stubBalance, fee)
 
       const newStubBalance = await deployer.vat.bags(STUB_1, deployer.erc20.address)
       const newSpBalance = await deployer.vat.bags(SERVICE_PROVIDER_1, deployer.erc20.address)
@@ -749,34 +564,28 @@ describe('Vat', function () {
     })
 
     it('is guarded', async () => {
-      await expect(bob.vat.suck(
-        SERVICE_PROVIDER_1,
-        bob.address,
-        bob.erc20.address,
-        utils.parseEther('100'),
-        0)
+      await expect(
+        bob.vat.suck(SERVICE_PROVIDER_1, bob.address, bob.erc20.address, utils.parseEther('100'), 0)
       ).to.be.revertedWith('Vat/not-authorized')
     })
 
     it('cannot suck if not live', async () => {
       await deployer.vat.cage()
-      await expect(deployer.vat.suck(
-        SERVICE_PROVIDER_1,
-        bob.address,
-        bob.erc20.address,
-        utils.parseEther('100'),
-        0
-      )).to.be.revertedWith('Vat/not-live')
+      await expect(
+        deployer.vat.suck(SERVICE_PROVIDER_1, bob.address, bob.erc20.address, utils.parseEther('100'), 0)
+      ).to.be.revertedWith('Vat/not-live')
     })
 
     it('cannot charge more fees than cost', async () => {
-      await expect(deployer.vat.suck(
-        SERVICE_PROVIDER_1,
-        bob.address,
-        bob.erc20.address,
-        utils.parseEther('100'),
-        utils.parseEther('110')
-      )).to.be.revertedWith('Vat/fee-too-high')
+      await expect(
+        deployer.vat.suck(
+          SERVICE_PROVIDER_1,
+          bob.address,
+          bob.erc20.address,
+          utils.parseEther('100'),
+          utils.parseEther('110')
+        )
+      ).to.be.revertedWith('Vat/fee-too-high')
     })
 
     it('cannot settle more than what the service provider has', async () => {
@@ -784,27 +593,17 @@ describe('Vat', function () {
       const bobBalance = await deployer.vat.gems(bob.address, bob.erc20.address)
 
       // try overflow and get more money from stub than exists
-      await expect(deployer.vat.suck(
-        SERVICE_PROVIDER_1,
-        bob.address,
-        bob.erc20.address,
-        spBalance.mul(2),
-        0
-      )).to.be.revertedWith('Vat/insufficient-funds')
+      await expect(
+        deployer.vat.suck(SERVICE_PROVIDER_1, bob.address, bob.erc20.address, spBalance.mul(2), 0)
+      ).to.be.revertedWith('Vat/insufficient-funds')
 
-      expect(await deployer.vat.bags(SERVICE_PROVIDER_1, deployer.erc20.address))
-        .to.be.eq(spBalance)
-      expect(await deployer.vat.gems(bob.address, deployer.erc20.address))
-        .to.be.eq(bobBalance)
+      expect(await deployer.vat.bags(SERVICE_PROVIDER_1, deployer.erc20.address)).to.be.eq(spBalance)
+      expect(await deployer.vat.gems(bob.address, deployer.erc20.address)).to.be.eq(bobBalance)
     })
 
     it('cannot settle from a stub', async () => {
       // add some funds to pay for the service
-      await deployer.vat['slip(address,address,int256)'](
-        alice.address,
-        alice.erc20.address,
-        utils.parseEther('100')
-      )
+      await deployer.vat['slip(address,address,int256)'](alice.address, alice.erc20.address, utils.parseEther('100'))
       // make a deal that we can settle later
       await deployer.vat.deal(
         STUB_1,
@@ -817,18 +616,12 @@ describe('Vat', function () {
       const stubBalance = await deployer.vat.bags(STUB_1, deployer.erc20.address)
       const bobBalance = await bob.vat.gems(bob.address, bob.erc20.address)
 
-      await expect(deployer.vat.suck(
-        STUB_1,
-        bob.address,
-        bob.erc20.address,
-        utils.parseEther('10'),
-        0
-      )).to.be.revertedWith('Vat/not-service-provider')
+      await expect(
+        deployer.vat.suck(STUB_1, bob.address, bob.erc20.address, utils.parseEther('10'), 0)
+      ).to.be.revertedWith('Vat/not-service-provider')
 
-      expect(await deployer.vat.bags(STUB_1, deployer.erc20.address))
-        .to.be.eq(stubBalance)
-      expect(await bob.vat.gems(bob.address, bob.erc20.address))
-        .to.be.eq(bobBalance)
+      expect(await deployer.vat.bags(STUB_1, deployer.erc20.address)).to.be.eq(stubBalance)
+      expect(await bob.vat.gems(bob.address, bob.erc20.address)).to.be.eq(bobBalance)
     })
 
     it('can settle from service provider to eoa account', async () => {

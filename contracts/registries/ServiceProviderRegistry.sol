@@ -12,7 +12,12 @@ import {AbstractWhitelistExpiry} from '../access/AbstractWhitelistExpiry.sol';
 
 /// @title A source of service providers
 /// @author mfw78 <mfw78@protonmail.com>
-contract ServiceProviderRegistry is IServiceProviderRegistry, AbstractTimestampedAccessControl, AbstractWhitelistExpiry, Multicall {
+contract ServiceProviderRegistry is
+    IServiceProviderRegistry,
+    AbstractTimestampedAccessControl,
+    AbstractWhitelistExpiry,
+    Multicall
+{
     // --- data ---
 
     // TODO: Analyse setting maximum TTL for accounts to prevent malicious signers granting tickets.
@@ -122,8 +127,7 @@ contract ServiceProviderRegistry is IServiceProviderRegistry, AbstractTimestampe
             require(bytes(data).length > 0, 'registry/require-uri');
             datastores[which] = data;
             emit ServiceProviderUpdated(which, what);
-        } 
-        else revert('registry/file-unrecognized-param');
+        } else revert('registry/file-unrecognized-param');
     }
 
     function file(
@@ -134,8 +138,7 @@ contract ServiceProviderRegistry is IServiceProviderRegistry, AbstractTimestampe
         if (what == 'maxTTL') {
             maxTTL[which] = data;
             emit ServiceProviderUpdated(which, what);
-        }
-        else revert('registry/file-unrecognized-param');
+        } else revert('registry/file-unrecognized-param');
     }
 
     /// @notice File integer parameters
@@ -148,11 +151,17 @@ contract ServiceProviderRegistry is IServiceProviderRegistry, AbstractTimestampe
         else revert('registry/file-unrecognized-param');
     }
 
-    function _grantRole(bytes32 role, address account) internal override(AccessControl, AbstractTimestampedAccessControl) {
+    function _grantRole(bytes32 role, address account)
+        internal
+        override(AccessControl, AbstractTimestampedAccessControl)
+    {
         AbstractTimestampedAccessControl._grantRole(role, account);
     }
 
-    function _revokeRole(bytes32 role, address account) internal override(AccessControl, AbstractTimestampedAccessControl) {
+    function _revokeRole(bytes32 role, address account)
+        internal
+        override(AccessControl, AbstractTimestampedAccessControl)
+    {
         AbstractTimestampedAccessControl._revokeRole(role, account);
     }
 }

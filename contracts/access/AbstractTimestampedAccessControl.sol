@@ -25,11 +25,7 @@ abstract contract AbstractTimestampedAccessControl is AccessControl, ITimestampe
         uint256 when
     ) public view returns (bool) {
         Timestamp storage chop = watchkeeper[account][role];
-        return (
-            chop.granted != 0 &&
-            chop.granted <= when && 
-            (chop.revoked == 0 || when <= chop.revoked)
-        );
+        return (chop.granted != 0 && chop.granted <= when && (chop.revoked == 0 || when <= chop.revoked));
     }
 
     /// @dev Standard call for OZ access control, followed by timestamping

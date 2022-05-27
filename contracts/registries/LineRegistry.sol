@@ -93,12 +93,10 @@ contract LineRegistry is ILineRegistry, Context {
         if (what == 'terms') {
             if (data == address(0)) delete lines[line];
             else lines[line].terms = data;
-        }
-        else if (what == 'service_provider_registry') {
+        } else if (what == 'service_provider_registry') {
             require(data != address(0), 'registry/invalid-spregistry');
             serviceProviderRegistry = IServiceProviderRegistry(data);
-        }
-        else revert('registry/file-unrecognized-param');
+        } else revert('registry/file-unrecognized-param');
     }
 
     /// @inheritdoc ILineRegistry
@@ -113,8 +111,7 @@ contract LineRegistry is ILineRegistry, Context {
             require(_line.terms != address(0), 'registry/line-not-exist');
             require(data < ONE, 'registry/invalid-cut');
             _line.cut = uint96(data);
-        }
-        else revert('registry/file-unrecognized-param');
+        } else revert('registry/file-unrecognized-param');
     }
 
     /// @inheritdoc ILineRegistry
