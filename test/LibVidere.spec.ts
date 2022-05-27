@@ -230,4 +230,27 @@ describe('Hash Library', function () {
       expect(cost.wad).to.be.eq(BigNumber.from(currentCosts.wad).add(addTerms[0].cost[1].wad))
     })
   })
+
+  context('Utilities', async () => {
+    it('can find cost denominated in gem', async () => {
+      const costs: ERC20Native[] = [
+        {
+          gem: '0x0000000000000000000000000000000000000001',
+          wad: utils.parseEther('2000').toString()
+        },
+        {
+          gem: constants.AddressZero,
+          wad: utils.parseEther('1000').toString()
+        }
+      ]
+
+      await expect(deployer.hashlib.findCost(
+        '0x0000000000000000000000000000000000000002',
+        costs
+      )).to.be.revertedWith('LibVidere/gem-not-found')
+
+      const cost = await deployer.hashlib.findCost(constants.AddressZero, costs)
+      expect(cost.wad).to.be.eq(utils.parseEther('1000'))
+    })
+  })
 })
