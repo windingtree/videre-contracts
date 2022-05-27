@@ -176,9 +176,7 @@ library LibVidere {
 
     function hash(StubState memory a) internal pure returns (bytes32) {
         return
-            keccak256(
-                abi.encode(STUB_STATE_TYPEHASH, a.which, a.params, hash(a.items), hash(a.terms), hash(a.cost))
-            );
+            keccak256(abi.encode(STUB_STATE_TYPEHASH, a.which, a.params, hash(a.items), hash(a.terms), hash(a.cost)));
     }
 
     // --- Utility hash functions

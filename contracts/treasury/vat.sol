@@ -57,7 +57,7 @@ contract Vat {
         unchecked {
             z = x + uint256(y);
             require(y >= 0 || z <= x);
-            require(y <= 0 || z >= x);            
+            require(y <= 0 || z >= x);
         }
     }
 

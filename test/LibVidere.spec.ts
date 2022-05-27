@@ -38,10 +38,7 @@ describe('Hash Library', function () {
       expiry: BigNumber.from(Math.floor(Date.now() / 1000) + 1200),
       which: utils.formatBytes32String('SOME_SERVICE_PROVIDER'),
       params: utils.keccak256(utils.toUtf8Bytes('params, ie. hash from ask struct')),
-      items: [
-        utils.keccak256(utils.toUtf8Bytes('ITEM_1')),
-        utils.keccak256(utils.toUtf8Bytes('ITEM_2'))
-      ],
+      items: [utils.keccak256(utils.toUtf8Bytes('ITEM_1')), utils.keccak256(utils.toUtf8Bytes('ITEM_2'))],
       terms: [
         {
           term: utils.keccak256(utils.toUtf8Bytes('TERM_1')),
@@ -90,9 +87,7 @@ describe('Hash Library', function () {
     stub = {
       which: utils.formatBytes32String('SOME_SERVICE_PROVIDER'),
       params: utils.keccak256(utils.toUtf8Bytes('params, ie. hash from ask struct')),
-      items: [
-        utils.keccak256(utils.toUtf8Bytes('SOME_ITEM'))
-      ],
+      items: [utils.keccak256(utils.toUtf8Bytes('SOME_ITEM'))],
       terms: [
         {
           term: utils.keccak256(utils.toUtf8Bytes('SOME_TERM')),
@@ -110,16 +105,14 @@ describe('Hash Library', function () {
   context('BidHash', async () => {
     it('SDK hash matches', async () => {
       const t = utils._TypedDataEncoder
-      expect(await deployer.hashlib.bidhash(bid))
-        .to.be.eq(t.hashStruct('Bid', eip712.bidask.Bid, bid))
+      expect(await deployer.hashlib.bidhash(bid)).to.be.eq(t.hashStruct('Bid', eip712.bidask.Bid, bid))
     })
   })
 
   context('StubState', async () => {
     it('SDK hash matches', async () => {
       const t = utils._TypedDataEncoder
-      expect(await deployer.hashlib.stubHash(stub))
-        .to.be.eq(t.hashStruct('StubState', eip712.stub.StubState, stub))
+      expect(await deployer.hashlib.stubHash(stub)).to.be.eq(t.hashStruct('StubState', eip712.stub.StubState, stub))
     })
   })
 
@@ -134,10 +127,7 @@ describe('Hash Library', function () {
     })
 
     it('can add items', async () => {
-      const currentItems: utils.BytesLike[] = [
-        utils.formatBytes32String('ITEM_1'),
-        utils.formatBytes32String('ITEM_2')
-      ]
+      const currentItems: utils.BytesLike[] = [utils.formatBytes32String('ITEM_1'), utils.formatBytes32String('ITEM_2')]
 
       const addItems: LibVidere.BidOptionItemStruct[] = [
         {
@@ -156,21 +146,21 @@ describe('Hash Library', function () {
       ]
 
       // add options with bad costings
-      await expect(deployer.hashlib['addOptions(bytes32[],(bytes32,(address,uint256)[])[],(address,uint256))'](
-        currentItems,
-        addItems,
-        {
-          gem: '0x0000000000000000000000000000000000000002',
-          wad: utils.parseEther('2000').toString()
-        }
-      )).to.be.revertedWith('LibVidere/gem-not-found')
+      await expect(
+        deployer.hashlib['addOptions(bytes32[],(bytes32,(address,uint256)[])[],(address,uint256))'](
+          currentItems,
+          addItems,
+          {
+            gem: '0x0000000000000000000000000000000000000002',
+            wad: utils.parseEther('2000').toString()
+          }
+        )
+      ).to.be.revertedWith('LibVidere/gem-not-found')
 
       // add the options
-      const { items, cost } = await deployer.hashlib['addOptions(bytes32[],(bytes32,(address,uint256)[])[],(address,uint256))'](
-        currentItems,
-        addItems,
-        currentCosts
-      )
+      const { items, cost } = await deployer.hashlib[
+        'addOptions(bytes32[],(bytes32,(address,uint256)[])[],(address,uint256))'
+      ](currentItems, addItems, currentCosts)
 
       // check the new item exists
       currentItems.push(addItems[0].item)
@@ -215,21 +205,19 @@ describe('Hash Library', function () {
       ]
 
       // add options with bad costings
-      await expect(deployer.hashlib['addOptions((bytes32,address,bytes)[],((bytes32,address,bytes),(address,uint256)[])[],(address,uint256))'](
-        currentTerms,
-        addTerms,
-        {
+      await expect(
+        deployer.hashlib[
+          'addOptions((bytes32,address,bytes)[],((bytes32,address,bytes),(address,uint256)[])[],(address,uint256))'
+        ](currentTerms, addTerms, {
           gem: '0x0000000000000000000000000000000000000002',
           wad: utils.parseEther('2000').toString()
-        }
-      )).to.be.revertedWith('LibVidere/gem-not-found')
+        })
+      ).to.be.revertedWith('LibVidere/gem-not-found')
 
       // add the options
-      const { terms, cost } = await deployer.hashlib['addOptions((bytes32,address,bytes)[],((bytes32,address,bytes),(address,uint256)[])[],(address,uint256))'](
-        currentTerms,
-        addTerms,
-        currentCosts
-      )
+      const { terms, cost } = await deployer.hashlib[
+        'addOptions((bytes32,address,bytes)[],((bytes32,address,bytes),(address,uint256)[])[],(address,uint256))'
+      ](currentTerms, addTerms, currentCosts)
 
       // check the new term exists
       currentTerms.push(addTerms[0].term)

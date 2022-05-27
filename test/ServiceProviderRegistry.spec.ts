@@ -70,24 +70,20 @@ describe('ServiceProviderRegistry', function () {
       })
       it('enrolling with the same salt from different users does not have hash collission', async () => {
         // try to enroll the second time
-        expect(await deployer.spRegistry.callStatic.enroll(SP_SALT, SP_URI))
-          .to.not.be.eq(serviceProviderId)
+        expect(await deployer.spRegistry.callStatic.enroll(SP_SALT, SP_URI)).to.not.be.eq(serviceProviderId)
       })
       it('cannot enroll the same provider twice', async () => {
         await bob.spRegistry.enroll(SP_SALT, SP_URI)
-        await expect(bob.spRegistry.enroll(SP_SALT, SP_URI))
-          .to.be.revertedWith('registry/provider-exists')
+        await expect(bob.spRegistry.enroll(SP_SALT, SP_URI)).to.be.revertedWith('registry/provider-exists')
       })
       it('sets the role admins', async () => {
         await bob.spRegistry.enroll(SP_SALT, SP_URI)
         const adminRole = getRole(serviceProviderId, 0)
         expect(await bob.spRegistry.hasRole(adminRole, bob.address)).to.be.eq(true)
-        expect(await bob.spRegistry.getRoleAdmin(adminRole))
-          .to.be.eq(adminRole)
+        expect(await bob.spRegistry.getRoleAdmin(adminRole)).to.be.eq(adminRole)
 
         for await (const role of ROLES) {
-          expect(await bob.spRegistry.getRoleAdmin(getRole(serviceProviderId, role)))
-            .to.be.eq(adminRole)
+          expect(await bob.spRegistry.getRoleAdmin(getRole(serviceProviderId, role))).to.be.eq(adminRole)
         }
       })
     })
@@ -101,26 +97,34 @@ describe('ServiceProviderRegistry', function () {
       it('files data uri', async () => {
         const what = utils.formatBytes32String('dataURI')
         // test doing this with a staff member first
-        await expect(staff.spRegistry['file(bytes32,bytes32,string)'](serviceProviderId, what, 'new-uri-here'))
-          .to.be.revertedWith('registry/write-not-authorized')
+        await expect(
+          staff.spRegistry['file(bytes32,bytes32,string)'](serviceProviderId, what, 'new-uri-here')
+        ).to.be.revertedWith('registry/write-not-authorized')
         // test doing this with a manager
         await expect(manager.spRegistry['file(bytes32,bytes32,string)'](serviceProviderId, what, 'new-uri-here'))
           .to.emit(bob.spRegistry, 'ServiceProviderUpdated')
           .withArgs(serviceProviderId, what)
       })
       it('cannot file blank data uri', async () => {
-        await expect(bob.spRegistry['file(bytes32,bytes32,string)'](serviceProviderId, utils.formatBytes32String('dataURI'), ''))
-          .to.be.revertedWith('registry/require-uri')
+        await expect(
+          bob.spRegistry['file(bytes32,bytes32,string)'](serviceProviderId, utils.formatBytes32String('dataURI'), '')
+        ).to.be.revertedWith('registry/require-uri')
       })
       it('cannot file unknown string parameter', async () => {
-        await expect(bob.spRegistry['file(bytes32,bytes32,string)'](serviceProviderId, utils.formatBytes32String('random-param'), 'some random param here'))
-          .to.be.revertedWith('registry/file-unrecognized-param')
+        await expect(
+          bob.spRegistry['file(bytes32,bytes32,string)'](
+            serviceProviderId,
+            utils.formatBytes32String('random-param'),
+            'some random param here'
+          )
+        ).to.be.revertedWith('registry/file-unrecognized-param')
       })
       it('files max TTL', async () => {
         const what = utils.formatBytes32String('maxTTL')
         const currentMaxTTL = await manager.spRegistry.maxTTL(serviceProviderId)
-        await expect(manager.spRegistry['file(bytes32,bytes32,uint256)'](serviceProviderId, what, 1))
-          .to.be.revertedWith('registry/admin-not-authorized')
+        await expect(
+          manager.spRegistry['file(bytes32,bytes32,uint256)'](serviceProviderId, what, 1)
+        ).to.be.revertedWith('registry/admin-not-authorized')
         expect(await manager.spRegistry.maxTTL(serviceProviderId)).to.be.eq(currentMaxTTL)
         await expect(bob.spRegistry['file(bytes32,bytes32,uint256)'](serviceProviderId, what, 1200))
           .to.emit(bob.spRegistry, 'ServiceProviderUpdated')
@@ -128,8 +132,13 @@ describe('ServiceProviderRegistry', function () {
         expect(await bob.spRegistry.maxTTL(serviceProviderId)).to.be.eq(1200)
       })
       it('cannot file unknown uint256 parameter', async () => {
-        await expect(bob.spRegistry['file(bytes32,bytes32,uint256)'](serviceProviderId, utils.formatBytes32String('random-param'), 1))
-          .to.be.revertedWith('registry/file-unrecognized-param')
+        await expect(
+          bob.spRegistry['file(bytes32,bytes32,uint256)'](
+            serviceProviderId,
+            utils.formatBytes32String('random-param'),
+            1
+          )
+        ).to.be.revertedWith('registry/file-unrecognized-param')
       })
     })
     context('#could', async () => {
@@ -148,12 +157,22 @@ describe('ServiceProviderRegistry', function () {
         await bob.spRegistry.grantRole(getRole(serviceProviderId, MANAGER_ROLE), manager.address)
         await network.provider.send('evm_setNextBlockTimestamp', [timestampWhenRevoked])
         await bob.spRegistry.revokeRole(getRole(serviceProviderId, MANAGER_ROLE), manager.address)
-        expect(await bob.spRegistry.could(serviceProviderId, MANAGER_ROLE, manager.address, timestampBefore)).to.be.eq(false)
-        expect(await bob.spRegistry.could(serviceProviderId, MANAGER_ROLE, manager.address, timestampWhenGranted)).to.be.eq(true)
+        expect(await bob.spRegistry.could(serviceProviderId, MANAGER_ROLE, manager.address, timestampBefore)).to.be.eq(
+          false
+        )
+        expect(
+          await bob.spRegistry.could(serviceProviderId, MANAGER_ROLE, manager.address, timestampWhenGranted)
+        ).to.be.eq(true)
         // we return true for could at the time that it was revoked as other blocks may be included before it was revoked
-        expect(await bob.spRegistry.could(serviceProviderId, MANAGER_ROLE, manager.address, timestampWhenRevoked)).to.be.eq(true)
-        expect(await bob.spRegistry.could(serviceProviderId, MANAGER_ROLE, manager.address, timestampWhenRevoked + 1)).to.be.eq(false)
-        expect(await bob.spRegistry.could(serviceProviderId, MANAGER_ROLE, manager.address, timestampAfter)).to.be.eq(false)
+        expect(
+          await bob.spRegistry.could(serviceProviderId, MANAGER_ROLE, manager.address, timestampWhenRevoked)
+        ).to.be.eq(true)
+        expect(
+          await bob.spRegistry.could(serviceProviderId, MANAGER_ROLE, manager.address, timestampWhenRevoked + 1)
+        ).to.be.eq(false)
+        expect(await bob.spRegistry.could(serviceProviderId, MANAGER_ROLE, manager.address, timestampAfter)).to.be.eq(
+          false
+        )
       })
     })
   })
@@ -182,7 +201,9 @@ describe('ServiceProviderRegistry', function () {
       expect(chops[0]).to.be.eq(grantTimestamp)
       expect(chops[1]).to.be.eq(revokeTimestamp)
       expect(await deployer.spRegistry.hasRole(role, alice.address)).to.be.eq(false)
-      await expect(deployer.spRegistry.grantRole(role, alice.address)).to.be.revertedWith('timestamp/previously-granted')
+      await expect(deployer.spRegistry.grantRole(role, alice.address)).to.be.revertedWith(
+        'timestamp/previously-granted'
+      )
       expect(await deployer.spRegistry.hadRole(role, alice.address, revokeTimestamp - 1)).to.be.eq(true)
       expect(await deployer.spRegistry.hadRole(role, alice.address, grantTimestamp - 1)).to.be.eq(false)
       expect(await deployer.spRegistry.hadRole(role, alice.address, revokeTimestamp + 1000)).to.be.eq(false)
@@ -195,7 +216,7 @@ describe('ServiceProviderRegistry', function () {
 
   context('Expirying whitelist', async () => {
     let timestamp: number
-    const TTL = (60 * 60 * 24 * 180)
+    const TTL = 60 * 60 * 24 * 180
 
     beforeEach('Get deployment timestamp', async () => {
       const d = await deployments.get('ServiceProviderRegistry')
@@ -218,10 +239,12 @@ describe('ServiceProviderRegistry', function () {
 
     context('#file', async () => {
       it('cannot set the time further into the future', async () => {
-        await expect(deployer.spRegistry['file(bytes32,uint256)'](utils.formatBytes32String('end'), (timestamp + TTL + 1))).to.be.revertedWith('registry/whitelist-later')
+        await expect(
+          deployer.spRegistry['file(bytes32,uint256)'](utils.formatBytes32String('end'), timestamp + TTL + 1)
+        ).to.be.revertedWith('registry/whitelist-later')
       })
       it('bring the expiry forward', async () => {
-        await expect(deployer.spRegistry['file(bytes32,uint256)'](utils.formatBytes32String('end'), (timestamp + 1)))
+        await expect(deployer.spRegistry['file(bytes32,uint256)'](utils.formatBytes32String('end'), timestamp + 1))
           .to.emit(deployer.spRegistry, 'WhitelistChanged')
           .withArgs(timestamp + 1)
         await network.provider.send('evm_setNextBlockTimestamp', [timestamp + 60])
@@ -233,18 +256,20 @@ describe('ServiceProviderRegistry', function () {
   context('Protocol governance', async () => {
     context('#file', async () => {
       it('fails if called by non-governance', async () => {
-        await expect(alice.spRegistry['file(bytes32,uint256)'](utils.formatBytes32String('end'), 1))
-          .to.be.revertedWith('registry/root-not-authorized')
+        await expect(alice.spRegistry['file(bytes32,uint256)'](utils.formatBytes32String('end'), 1)).to.be.revertedWith(
+          'registry/root-not-authorized'
+        )
       })
       it('fails if specifying invalid parameter', async () => {
-        await expect(deployer.spRegistry['file(bytes32,uint256)'](utils.formatBytes32String('wrong-param'), 1))
-          .to.be.revertedWith('registry/file-unrecognized-param')
+        await expect(
+          deployer.spRegistry['file(bytes32,uint256)'](utils.formatBytes32String('wrong-param'), 1)
+        ).to.be.revertedWith('registry/file-unrecognized-param')
       })
       it('can set minimum TTL', async () => {
         // default setting from deployment
         expect(await alice.spRegistry.minTTL()).to.be.eq(0)
-        await expect(deployer.spRegistry['file(bytes32,uint256)'](utils.formatBytes32String('minTTL'), 1200))
-          .to.not.be.reverted
+        await expect(deployer.spRegistry['file(bytes32,uint256)'](utils.formatBytes32String('minTTL'), 1200)).to.not.be
+          .reverted
         expect(await alice.spRegistry.minTTL()).to.be.eq(1200)
       })
     })
