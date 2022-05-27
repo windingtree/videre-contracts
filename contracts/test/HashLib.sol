@@ -35,10 +35,11 @@ contract HashLib {
     }
 
     /// @dev find the cost denominated in 'gem'
-    function findCost(
-        address gem,
-        LibVidere.ERC20Native[] memory costs
-    ) public pure returns(LibVidere.ERC20Native memory cost) {
+    function findCost(address gem, LibVidere.ERC20Native[] memory costs)
+        public
+        pure
+        returns (LibVidere.ERC20Native memory cost)
+    {
         return LibVidere.gemCost(gem, costs);
     }
 }

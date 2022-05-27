@@ -244,10 +244,9 @@ describe('Hash Library', function () {
         }
       ]
 
-      await expect(deployer.hashlib.findCost(
-        '0x0000000000000000000000000000000000000002',
-        costs
-      )).to.be.revertedWith('LibVidere/gem-not-found')
+      await expect(deployer.hashlib.findCost('0x0000000000000000000000000000000000000002', costs)).to.be.revertedWith(
+        'LibVidere/gem-not-found'
+      )
 
       const cost = await deployer.hashlib.findCost(constants.AddressZero, costs)
       expect(cost.wad).to.be.eq(utils.parseEther('1000'))
