@@ -34,43 +34,24 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
       for (const wallet of TEST_WALLETS) {
         for (const role of [WHITELIST_ROLE, DEFAULT_ADMIN_ROLE]) {
-          const hasRole = await read(
-            'ServiceProviderRegistry',
-            {},
-            'hasRole',
-            role, wallet
-          )
+          const hasRole = await read('ServiceProviderRegistry', {}, 'hasRole', role, wallet)
           if (!hasRole) calls.push(iface.encodeFunctionData('grantRole', [role, wallet]))
         }
       }
 
       // no problems executing this all the time, just wastes test gas.
       if (calls.length > 0) {
-        await execute(
-          'ServiceProviderRegistry',
-          { from: deployer, log: true },
-          'multicall',
-          calls
-        )
+        await execute('ServiceProviderRegistry', { from: deployer, log: true }, 'multicall', calls)
       }
 
       // everytime this runs we will gift tokens
       // mint test tokens to team testing wallets
       for await (const wallet of TEST_WALLETS) {
-        await execute(
-          'MockERC20',
-          { from: deployer, log: true },
-          'mint', wallet, NUM_TEST_TOKENS
-        )
+        await execute('MockERC20', { from: deployer, log: true }, 'mint', wallet, NUM_TEST_TOKENS)
       }
 
       // make sure that the gemjoin contract is rely'd
-      await execute(
-        'Vat',
-        { from: deployer, log: true },
-        'rely',
-        mockERC20GemJoinDeploy.address
-      )
+      await execute('Vat', { from: deployer, log: true }, 'rely', mockERC20GemJoinDeploy.address)
     }
   }
 }
