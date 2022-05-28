@@ -64,12 +64,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
         from: deployer,
         log: true,
         autoMine: true,
-        args: [
-          GEMJOIN_EIP712_NAME,
-          GEMJOIN_EIP712_VERSION,
-          vatDeploy.address,
-          mockERC20Deploy.address
-        ]
+        args: [GEMJOIN_EIP712_NAME, GEMJOIN_EIP712_VERSION, vatDeploy.address, mockERC20Deploy.address]
       })
     }
   }
