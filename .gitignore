@@ -20,6 +20,7 @@ reports/
 coverage*
 inheritance-graph.dot
 docs/
+deployments/
 
 # dotenv
 .env*
