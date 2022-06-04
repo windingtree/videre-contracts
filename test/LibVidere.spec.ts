@@ -1,36 +1,36 @@
-import { ethers, getNamedAccounts, deployments, getUnnamedAccounts } from 'hardhat'
+import { ethers, getNamedAccounts, deployments, getUnnamedAccounts } from 'hardhat';
 
-import { setupUser, setupUsers } from './utils'
+import { setupUser, setupUsers } from './utils';
 
-import { expect } from './chai-setup'
-import { BigNumber, constants, utils } from 'ethers'
-import { eip712 } from '@windingtree/videre-sdk'
-import { HashLib, LibVidere } from '../typechain/contracts/test/HashLib'
-import { ERC20Native } from '@windingtree/videre-sdk/dist/cjs/proto/token'
+import { expect } from './chai-setup';
+import { BigNumber, constants, utils } from 'ethers';
+import { eip712 } from '@windingtree/videre-sdk';
+import { HashLib, LibVidere } from '../typechain/contracts/test/HashLib';
+import { ERC20Native } from '@windingtree/videre-sdk/dist/cjs/proto/token';
 
 const setup = deployments.createFixture(async () => {
-  await deployments.fixture('Videre')
-  const { deployer } = await getNamedAccounts()
+  await deployments.fixture('Videre');
+  const { deployer } = await getNamedAccounts();
   const contracts = {
     hashlib: (await ethers.getContract('HashLib')) as HashLib
-  }
-  const users = await setupUsers(await getUnnamedAccounts(), contracts)
+  };
+  const users = await setupUsers(await getUnnamedAccounts(), contracts);
 
   return {
     users,
     deployer: await setupUser(deployer, contracts),
     ...contracts
-  }
-})
+  };
+});
 
 describe('Hash Library', function () {
-  let deployer: { address: string } & { hashlib: HashLib }
-  let bid: any
-  let stub: any
+  let deployer: { address: string } & { hashlib: HashLib };
+  let bid: any;
+  let stub: any;
 
   beforeEach('load fixture', async () => {
     // eslint-disable-next-line @typescript-eslint/no-extra-semi
-    ;({ deployer } = await setup())
+    ({ deployer } = await setup());
 
     bid = {
       salt: utils.formatBytes32String('SALT'),
@@ -82,7 +82,7 @@ describe('Hash Library', function () {
           gem: constants.AddressZero
         }
       ]
-    }
+    };
 
     stub = {
       which: utils.formatBytes32String('SOME_SERVICE_PROVIDER'),
@@ -99,35 +99,38 @@ describe('Hash Library', function () {
         gem: constants.AddressZero,
         wad: utils.parseEther('1000').toString()
       }
-    }
-  })
+    };
+  });
 
   context('BidHash', async () => {
     it('SDK hash matches', async () => {
-      const t = utils._TypedDataEncoder
-      expect(await deployer.hashlib.bidhash(bid)).to.be.eq(t.hashStruct('Bid', eip712.bidask.Bid, bid))
-    })
-  })
+      const t = utils._TypedDataEncoder;
+      expect(await deployer.hashlib.bidhash(bid)).to.be.eq(t.hashStruct('Bid', eip712.bidask.Bid, bid));
+    });
+  });
 
   context('StubState', async () => {
     it('SDK hash matches', async () => {
-      const t = utils._TypedDataEncoder
-      expect(await deployer.hashlib.stubHash(stub)).to.be.eq(t.hashStruct('StubState', eip712.stub.StubState, stub))
-    })
-  })
+      const t = utils._TypedDataEncoder;
+      expect(await deployer.hashlib.stubHash(stub)).to.be.eq(t.hashStruct('StubState', eip712.stub.StubState, stub));
+    });
+  });
 
   context('Can add optional items / terms', async () => {
-    let currentCosts: ERC20Native
+    let currentCosts: ERC20Native;
 
     beforeEach('setup current costs', async () => {
       currentCosts = {
         gem: constants.AddressZero,
         wad: utils.parseEther('2000').toString()
-      }
-    })
+      };
+    });
 
     it('can add items', async () => {
-      const currentItems: utils.BytesLike[] = [utils.formatBytes32String('ITEM_1'), utils.formatBytes32String('ITEM_2')]
+      const currentItems: utils.BytesLike[] = [
+        utils.formatBytes32String('ITEM_1'),
+        utils.formatBytes32String('ITEM_2')
+      ];
 
       const addItems: LibVidere.BidOptionItemStruct[] = [
         {
@@ -143,7 +146,7 @@ describe('Hash Library', function () {
             }
           ]
         }
-      ]
+      ];
 
       // add options with bad costings
       await expect(
@@ -155,21 +158,21 @@ describe('Hash Library', function () {
             wad: utils.parseEther('2000').toString()
           }
         )
-      ).to.be.revertedWith('LibVidere/gem-not-found')
+      ).to.be.revertedWith('LibVidere/gem-not-found');
 
       // add the options
       const { items, cost } = await deployer.hashlib[
         'addOptions(bytes32[],(bytes32,(address,uint256)[])[],(address,uint256))'
-      ](currentItems, addItems, currentCosts)
+      ](currentItems, addItems, currentCosts);
 
       // check the new item exists
-      currentItems.push(addItems[0].item)
-      expect(items.length).to.be.eq(currentItems.length)
-      expect(items).to.be.deep.eq(currentItems)
+      currentItems.push(addItems[0].item);
+      expect(items.length).to.be.eq(currentItems.length);
+      expect(items).to.be.deep.eq(currentItems);
 
       // add the cost and confirm
-      expect(cost.wad).to.be.eq(BigNumber.from(currentCosts.wad).add(addItems[0].cost[1].wad))
-    })
+      expect(cost.wad).to.be.eq(BigNumber.from(currentCosts.wad).add(addItems[0].cost[1].wad));
+    });
 
     it('can add terms', async () => {
       const currentTerms: LibVidere.BidTermStruct[] = [
@@ -183,7 +186,7 @@ describe('Hash Library', function () {
           impl: constants.AddressZero,
           txPayload: '0x'
         }
-      ]
+      ];
       const addTerms: LibVidere.BidOptionTermStruct[] = [
         {
           term: {
@@ -202,7 +205,7 @@ describe('Hash Library', function () {
             }
           ]
         }
-      ]
+      ];
 
       // add options with bad costings
       await expect(
@@ -212,24 +215,24 @@ describe('Hash Library', function () {
           gem: '0x0000000000000000000000000000000000000002',
           wad: utils.parseEther('2000').toString()
         })
-      ).to.be.revertedWith('LibVidere/gem-not-found')
+      ).to.be.revertedWith('LibVidere/gem-not-found');
 
       // add the options
       const { terms, cost } = await deployer.hashlib[
         'addOptions((bytes32,address,bytes)[],((bytes32,address,bytes),(address,uint256)[])[],(address,uint256))'
-      ](currentTerms, addTerms, currentCosts)
+      ](currentTerms, addTerms, currentCosts);
 
       // check the new term exists
-      currentTerms.push(addTerms[0].term)
-      expect(terms.length).to.eq(currentTerms.length)
-      expect(terms[terms.length - 1][0]).to.be.eq(addTerms[0].term.term)
-      expect(terms[terms.length - 1][1]).to.be.eq(addTerms[0].term.impl)
-      expect(terms[terms.length - 1][2]).to.be.eq(addTerms[0].term.txPayload)
+      currentTerms.push(addTerms[0].term);
+      expect(terms.length).to.eq(currentTerms.length);
+      expect(terms[terms.length - 1][0]).to.be.eq(addTerms[0].term.term);
+      expect(terms[terms.length - 1][1]).to.be.eq(addTerms[0].term.impl);
+      expect(terms[terms.length - 1][2]).to.be.eq(addTerms[0].term.txPayload);
 
       // add the cost and confirm
-      expect(cost.wad).to.be.eq(BigNumber.from(currentCosts.wad).add(addTerms[0].cost[1].wad))
-    })
-  })
+      expect(cost.wad).to.be.eq(BigNumber.from(currentCosts.wad).add(addTerms[0].cost[1].wad));
+    });
+  });
 
   context('Utilities', async () => {
     it('can find cost denominated in gem', async () => {
@@ -242,14 +245,14 @@ describe('Hash Library', function () {
           gem: constants.AddressZero,
           wad: utils.parseEther('1000').toString()
         }
-      ]
+      ];
 
       await expect(deployer.hashlib.findCost('0x0000000000000000000000000000000000000002', costs)).to.be.revertedWith(
         'LibVidere/gem-not-found'
-      )
+      );
 
-      const cost = await deployer.hashlib.findCost(constants.AddressZero, costs)
-      expect(cost.wad).to.be.eq(utils.parseEther('1000'))
-    })
-  })
-})
+      const cost = await deployer.hashlib.findCost(constants.AddressZero, costs);
+      expect(cost.wad).to.be.eq(utils.parseEther('1000'));
+    });
+  });
+});

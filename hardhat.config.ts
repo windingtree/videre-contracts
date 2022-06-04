@@ -1,17 +1,17 @@
-import { HardhatUserConfig } from 'hardhat/types'
+import { HardhatUserConfig } from 'hardhat/types';
 
-import '@openzeppelin/hardhat-upgrades'
-import '@nomiclabs/hardhat-ethers'
-import '@nomiclabs/hardhat-waffle'
-import '@nomiclabs/hardhat-solhint'
-import '@typechain/hardhat'
-import 'hardhat-deploy'
-import 'hardhat-gas-reporter'
-import 'solidity-coverage'
-import 'hardhat-docgen'
-import { nodeUrl, accounts } from './utils/network'
+import '@openzeppelin/hardhat-upgrades';
+import '@nomiclabs/hardhat-ethers';
+import '@nomiclabs/hardhat-waffle';
+import '@nomiclabs/hardhat-solhint';
+import '@typechain/hardhat';
+import 'hardhat-deploy';
+import 'hardhat-gas-reporter';
+import 'solidity-coverage';
+import 'hardhat-docgen';
+import { nodeUrl, accounts } from './utils/network';
 
-import 'dotenv/config'
+import 'dotenv/config';
 
 const config: HardhatUserConfig = {
   solidity: {
@@ -131,6 +131,6 @@ const config: HardhatUserConfig = {
     clear: true,
     runOnCompile: false
   }
-}
+};
 
-export default config
+export default config;
