@@ -28,25 +28,24 @@ jobs:
       run: yarn install --frozen-lockfile
     - name: Install semantic-release extra plugins
       run: npm install --save-dev @semantic-release/changelog
-    - name: Download artifacts
-      uses: actions/download-artifact@v3
-      with:
-        name: deployments
     - name: Lint
       run: npm run lint --if-present
     - name: Test
       run: npm run test
     - name: Build
       run: npm run build
+    - name: Cache deployments
+      id: cache-primes
+      uses: actions/cache@v3
+      with:
+        path: deployments
+        key: deployments
+
     - name: Deploy to staging chain
       run: yarn hardhat deploy --network sokol
       env:
         MNEMONIC: ${{ secrets.MNEMONIC }}
-    - name: Upload deployment artifacts
-      uses: actions/upload-artifact@v3
-      with:
-        name: deployments
-        path: deployments
+      
     - name: Release
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
