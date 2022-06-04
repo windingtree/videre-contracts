@@ -1,18 +1,54 @@
-name: Publish Package to npmjs
+name: Release
+
 on:
-  release:
-    types: [created]
+  push:
+    branches: [main]
+
 jobs:
-  build:
+  release:
+    name: Release
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: '16.x'
-          registry-url: 'https://registry.npmjs.org'
-      - run: yarn
-      - run: yarn hardhat compile
-      - run: npm publish --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Setup Node.js
+      uses: actions/setup-node@v1
+      with:
+        node-version: 16.x
+    - id: yarn-cache
+      run: echo "::set-output name=dir::$(yarn cache dir)"
+    - uses: actions/cache@v3
+      with:
+        path: ${{ steps.yarn-cache.outputs.dir }}
+        key: yarn-${{ hashFiles('**/yarn.lock') }}
+        restore-keys: |
+          yarn-
+    - name: Install dependencies
+      run: yarn install --frozen-lockfile
+    - name: Install semantic-release extra plugins
+      run: npm install --save-dev @semantic-release/changelog
+    - name: Download artifacts
+      uses: actions/download-artifact@v3
+      with:
+        name: deployments
+    - name: Lint
+      run: npm run lint --if-present
+    - name: Test
+      run: npm run test
+    - name: Build
+      run: npm run build
+    - name: Deploy to staging chain
+      run: yarn hardhat deploy --network sokol
+      env:
+        MNEMONIC: ${{ secrets.MNEMONIC }}
+    - name: Upload deployment artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: deployments
+        path: deployments
+    - name: Release
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        NPM_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
+      run: npx semantic-release
