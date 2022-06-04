@@ -89,6 +89,7 @@
     "test": "hardhat test",
     "commit": "git-cz -S",
     "prepare": "husky install",
+    "build": "yarn compile",
     "lint": "npx eslint . --ext .ts && yarn solhint contracts/**/*.sol && npx prettier -c .",
     "lint:fix": "npx eslint . --ext .ts,.sol --fix && npx prettier --write ."
   },
