@@ -18,7 +18,6 @@ bytes32 constant WHITELIST_ROLE = keccak256('videre.roles.whitelist');
 /// @title Give some gas and tokens
 /// @dev Distribution contract used for minting test tokens and allocating privileges
 contract Giver {
-
     // --- Auth
     mapping(address => uint256) public wards;
 
@@ -36,15 +35,12 @@ contract Giver {
     }
 
     /// @dev the token that will be minted to the user, must support MintLike
-    ERC20MintLike internal gem;   // token to be minted
+    ERC20MintLike internal gem; // token to be minted
 
     /// @dev registry to which to authorize the user on the whitelist
     ServiceProviderRegistryLike internal serviceProviderRegistry;
 
-    constructor(
-        ERC20MintLike _gem,
-        ServiceProviderRegistryLike _serviceProviderRegistry
-    ) {
+    constructor(ERC20MintLike _gem, ServiceProviderRegistryLike _serviceProviderRegistry) {
         // add deployer to auth list
         wards[msg.sender] = 1;
 
@@ -89,5 +85,4 @@ contract Giver {
             gem.mint(to, wad);
         }
     }
-
 }

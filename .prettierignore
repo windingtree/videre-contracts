@@ -4,3 +4,4 @@ node_modules
 typechain
 coverage
 .github
+deployments
