@@ -48,6 +48,9 @@ jobs:
         ETH_NODE_URI_SOKOL: ${{ secrets.ETH_NODE_URI_SOKOL }}
     - name: Verify contracts
       run: yarn hardhat sourcify --network sokol
+      env:
+        MNEMONIC: ${{ secrets.MNEMONIC }}
+        ETH_NODE_URI_SOKOL: ${{ secrets.ETH_NODE_URI_SOKOL }}
     - name: Release
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
