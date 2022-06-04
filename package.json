@@ -88,6 +88,7 @@
     "docgen": "hardhat docgen",
     "test": "hardhat test",
     "commit": "git-cz -S",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "lint:fix": "npx eslint . --ext .ts,.sol --fix && npx prettier --write ."
   }
 }
