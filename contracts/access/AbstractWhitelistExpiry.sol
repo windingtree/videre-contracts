@@ -11,7 +11,7 @@ abstract contract AbstractWhitelistExpiry is AccessControl {
     /// @dev unique hash for whitelist role
     bytes32 private constant WHITELIST_ROLE = keccak256('videre.roles.whitelist');
     /// @dev unix timestamp for the end of the whitelist period
-    uint256 internal end;
+    uint256 public end;
 
     // --- events
     event WhitelistChanged(uint256);
