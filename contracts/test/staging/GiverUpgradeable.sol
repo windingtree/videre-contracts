@@ -2,19 +2,14 @@
 
 pragma solidity ^0.8.13;
 
-import {Giver,ERC20MintLike,ServiceProviderRegistryLike} from '../../utils/Giver.sol';
+import {Giver, ERC20MintLike, ServiceProviderRegistryLike} from '../../utils/Giver.sol';
 
 contract GiverUpgradeable is Giver {
+    constructor(ERC20MintLike _gem, ServiceProviderRegistryLike _serviceProviderRegistry)
+        Giver(_gem, _serviceProviderRegistry)
+    {}
 
-    constructor(
-        ERC20MintLike _gem,
-        ServiceProviderRegistryLike _serviceProviderRegistry
-    ) Giver(_gem, _serviceProviderRegistry) {}
-
-    function postUpgrade(
-        ERC20MintLike _gem,
-        ServiceProviderRegistryLike _serviceProviderRegistry
-    ) public {
+    function postUpgrade(ERC20MintLike _gem, ServiceProviderRegistryLike _serviceProviderRegistry) public {
         if (upgrader == address(0)) {
             upgrader = msg.sender;
         }

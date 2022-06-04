@@ -34,10 +34,16 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
         if (!hasRole) calls.push(iface.encodeFunctionData('grantRole', [role, wallet]));
       }
 
-      await execute('MockERC20', { from: deployer, log: true }, 'grantRole', utils.keccak256(utils.toUtf8Bytes('MINTER_ROLE')), wallet)
+      await execute(
+        'MockERC20',
+        { from: deployer, log: true },
+        'grantRole',
+        utils.keccak256(utils.toUtf8Bytes('MINTER_ROLE')),
+        wallet
+      );
     }
 
-    await execute('Giver', { from: deployer, log: true }, 'rely', MINION)
+    await execute('Giver', { from: deployer, log: true }, 'rely', MINION);
 
     // no problems executing this all the time, just wastes test gas.
     if (calls.length > 0) {
@@ -46,5 +52,5 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   }
 };
 export default func;
-func.tags = ['Videre','StagingEnv'];
+func.tags = ['Videre', 'StagingEnv'];
 //func.dependencies = ['Videre'];

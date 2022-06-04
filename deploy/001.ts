@@ -105,8 +105,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
           }
         : false,
       log: true,
-      autoMine: true,
-      
+      autoMine: true
     });
 
     if (mockERC20Deploy.newlyDeployed) {
@@ -126,16 +125,14 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     }
 
     // deploy the giver
-    const giverDeploy = await deploy('Giver',
-      {
-        from: deployer,
-        contract: !network.tags.staging ? 'Giver' : 'GiverUpgradeable',
-        proxy: PROXY_SETTINGS_WITH_UPGRADE,
-        log: true,
-        autoMine: true,
-        args: [mockERC20Deploy.address, serviceProviderRegistryDeploy.address]
-      }
-    )
+    const giverDeploy = await deploy('Giver', {
+      from: deployer,
+      contract: !network.tags.staging ? 'Giver' : 'GiverUpgradeable',
+      proxy: PROXY_SETTINGS_WITH_UPGRADE,
+      log: true,
+      autoMine: true,
+      args: [mockERC20Deploy.address, serviceProviderRegistryDeploy.address]
+    });
   }
 };
 
