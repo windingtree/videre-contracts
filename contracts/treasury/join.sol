@@ -35,7 +35,7 @@ interface GemLike {
     ) external;
 }
 
-contract GemJoin is EIP712 {
+contract GemJoin {
     // --- Auth ---
     mapping(address => uint256) public wards;
 
@@ -60,21 +60,6 @@ contract GemJoin is EIP712 {
     uint256 public dec;
     uint256 public live; // Active Flag
 
-    bytes32 private constant GEMJOIN_PERMIT_TYPEHASH = keccak256('GemJoinPermit(address usr,uint256 wad,bytes permit');
-    struct GemJoinPermit {
-        address usr;
-        uint256 wad;
-        bytes permit;
-    }
-
-    struct EIP20Permit {
-        address owner;
-        uint256 deadline;
-        uint8 v;
-        bytes32 r;
-        bytes32 s;
-    }
-
     // Events
     event Rely(address indexed usr);
     event Deny(address indexed usr);
@@ -83,11 +68,9 @@ contract GemJoin is EIP712 {
     event Cage();
 
     constructor(
-        string memory name,
-        string memory version,
         address vat_,
         address gem_
-    ) EIP712(name, version) {
+    ) {
         wards[msg.sender] = 1;
         live = 1;
         vat = VatLike(vat_);
@@ -117,6 +100,35 @@ contract GemJoin is EIP712 {
         _join(msg.sender, usr, wad);
     }
 
+    function exit(address usr, uint256 wad) external {
+        require(wad <= 2**255, 'GemJoin/overflow');
+        vat.slip(msg.sender, address(gem), -int256(wad));
+        require(gem.transfer(usr, wad), 'GemJoin/failed-transfer');
+        emit Exit(usr, wad);
+    }
+}
+
+contract EIP2612GemJoin is GemJoin {
+
+    // --- data
+
+    bytes32 private constant GEMJOIN_PERMIT_TYPEHASH = keccak256('GemJoinPermit(address usr,uint256 wad,bytes permit');
+
+    struct EIP20Permit {
+        address owner;
+        uint256 deadline;
+        uint8 v;
+        bytes32 r;
+        bytes32 s;
+    }
+
+    constructor(
+        string memory name,
+        string memory version,
+        address vat_,
+        address gem_
+    ) GemJoin(vat_, gem_) {}
+
     /// @dev EIP-2612 support, handy on GC!
     /// @dev WARNING: Signatures MUST be implemented for calling this contract. If EIP-712
     //       ERC20Permit extension only is sent, adversaries could monitor the mempool for
@@ -128,24 +140,14 @@ contract GemJoin is EIP712 {
         EIP20Permit calldata permit,
         bytes calldata sig
     ) external {
-        require(
-            SignatureChecker.isValidSignatureNow(permit.owner, hash(GemJoinPermit(usr, wad, abi.encode(permit))), sig),
-            'GemJoin/invalid-sig'
-        );
+        require(0 == 1, 'EIP2612GemJoin/not-implemented');
+        // require(
+        //     SignatureChecker.isValidSignatureNow(permit.owner, hash(GemJoinPermit(usr, wad, abi.encode(permit))), sig),
+        //     'GemJoin/invalid-sig'
+        // );
 
         gem.permit(permit.owner, address(this), wad, permit.deadline, permit.v, permit.r, permit.s);
         _join(permit.owner, usr, wad);
     }
 
-    function exit(address usr, uint256 wad) external {
-        require(wad <= 2**255, 'GemJoin/overflow');
-        vat.slip(msg.sender, address(gem), -int256(wad));
-        require(gem.transfer(usr, wad), 'GemJoin/failed-transfer');
-        emit Exit(usr, wad);
-    }
-
-    // --- helpers
-    function hash(GemJoinPermit memory a) internal pure returns (bytes32) {
-        return keccak256(abi.encode(GEMJOIN_PERMIT_TYPEHASH, a.usr, a.wad, a.permit));
-    }
 }
