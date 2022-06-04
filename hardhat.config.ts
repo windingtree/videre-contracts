@@ -53,7 +53,7 @@ const config: HardhatUserConfig = {
           }
         : undefined,
       saveDeployments: false,
-      tags: ['local', 'forked']
+      tags: process.env.HARDHAT_FORK ? ['forked'] : undefined
     },
     ganache: {
       url: 'http://127.0.0.1:7545/',
@@ -99,7 +99,8 @@ const config: HardhatUserConfig = {
     sokol: {
       url: nodeUrl('sokol'),
       accounts: accounts('sokol'),
-      tags: ['staging']
+      tags: ['staging'],
+      gasPrice: 30000000000
     },
     gnosis: {
       url: nodeUrl('gnosis'),
