@@ -9,21 +9,28 @@ import '@openzeppelin/contracts-upgradeable/token/ERC20/extensions/draft-ERC20Pe
 import '@openzeppelin/contracts-upgradeable/token/ERC20/extensions/ERC20FlashMintUpgradeable.sol';
 
 /// @custom:security-contact security@windingtree.com
-contract MockERC20Upgradeable is ERC20Upgradeable, ERC20BurnableUpgradeable, PausableUpgradeable, AccessControlUpgradeable, ERC20PermitUpgradeable, ERC20FlashMintUpgradeable {
+contract MockERC20Upgradeable is
+    ERC20Upgradeable,
+    ERC20BurnableUpgradeable,
+    PausableUpgradeable,
+    AccessControlUpgradeable,
+    ERC20PermitUpgradeable,
+    ERC20FlashMintUpgradeable
+{
     bytes32 public constant PAUSER_ROLE = keccak256('PAUSER_ROLE');
     bytes32 public constant MINTER_ROLE = keccak256('MINTER_ROLE');
 
-    function initialize() initializer public {
-      __ERC20_init('MockERC20', 'MTK');
-      __ERC20Burnable_init();
-      __Pausable_init();
-      __AccessControl_init();
-      __ERC20Permit_init('MockERC20');
-      __ERC20FlashMint_init();
+    function initialize() public initializer {
+        __ERC20_init('MockERC20', 'MTK');
+        __ERC20Burnable_init();
+        __Pausable_init();
+        __AccessControl_init();
+        __ERC20Permit_init('MockERC20');
+        __ERC20FlashMint_init();
 
-      _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
-      _grantRole(PAUSER_ROLE, msg.sender);
-      _grantRole(MINTER_ROLE, msg.sender);
+        _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
+        _grantRole(PAUSER_ROLE, msg.sender);
+        _grantRole(MINTER_ROLE, msg.sender);
     }
 
     function pause() public onlyRole(PAUSER_ROLE) {

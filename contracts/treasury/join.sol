@@ -67,10 +67,7 @@ contract GemJoin {
     event Exit(address usr, uint256 wad);
     event Cage();
 
-    constructor(
-        address vat_,
-        address gem_
-    ) {
+    constructor(address vat_, address gem_) {
         wards[msg.sender] = 1;
         live = 1;
         vat = VatLike(vat_);
@@ -109,7 +106,6 @@ contract GemJoin {
 }
 
 contract EIP2612GemJoin is GemJoin {
-
     // --- data
 
     bytes32 private constant GEMJOIN_PERMIT_TYPEHASH = keccak256('GemJoinPermit(address usr,uint256 wad,bytes permit');
@@ -149,5 +145,4 @@ contract EIP2612GemJoin is GemJoin {
         gem.permit(permit.owner, address(this), wad, permit.deadline, permit.v, permit.r, permit.s);
         _join(permit.owner, usr, wad);
     }
-
 }
