@@ -4,7 +4,8 @@ import { DeployFunction } from 'hardhat-deploy/types';
 import { utils } from 'ethers';
 import { ServiceProviderRegistry__factory } from '../typechain';
 
-const MINION = '0xcF76325B47a0edF0723DC4071A73C41B4FBc44eA';
+// const MINION = '0xcF76325B47a0edF0723DC4071A73C41B4FBc44eA';
+const MINION = '0xC210aC382da4AC041Bc74E78DcA58456B7B770c4';
 
 // roles
 const DEFAULT_ADMIN_ROLE = '0x0000000000000000000000000000000000000000000000000000000000000000';
