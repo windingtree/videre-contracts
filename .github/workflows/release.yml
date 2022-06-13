@@ -29,13 +29,13 @@ jobs:
     - name: Install dependencies
       run: yarn install --frozen-lockfile
     - name: Install semantic-release extra plugins
-      run: npm install --save-dev @semantic-release/changelog
+      run: yarn add @semantic-release/changelog -D
     - name: Lint
-      run: npm run lint --if-present
+      run: yarn lint --if-present
     - name: Build
-      run: npm run build
+      run: yarn build
     - name: Test
-      run: npm run test
+      run: yarn test
     - name: Cache deployments
       id: cache-primes
       uses: actions/cache@v3
