@@ -166,12 +166,12 @@ describe('Hash Library', function () {
       ](currentItems, addItems, currentCosts);
 
       // check the new item exists
-      currentItems.push(addItems[0].item);
+      currentItems.push(await addItems[0].item);
       expect(items.length).to.be.eq(currentItems.length);
       expect(items).to.be.deep.eq(currentItems);
 
       // add the cost and confirm
-      expect(cost.wad).to.be.eq(BigNumber.from(currentCosts.wad).add(addItems[0].cost[1].wad));
+      expect(cost.wad).to.be.eq(BigNumber.from(currentCosts.wad).add(await addItems[0].cost[1].wad));
     });
 
     it('can add terms', async () => {
@@ -230,7 +230,7 @@ describe('Hash Library', function () {
       expect(terms[terms.length - 1][2]).to.be.eq(addTerms[0].term.txPayload);
 
       // add the cost and confirm
-      expect(cost.wad).to.be.eq(BigNumber.from(currentCosts.wad).add(addTerms[0].cost[1].wad));
+      expect(cost.wad).to.be.eq(BigNumber.from(currentCosts.wad).add(await addTerms[0].cost[1].wad));
     });
   });
 
