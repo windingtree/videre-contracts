@@ -35,8 +35,8 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     network.live && network.tags.staging
       ? {
           owner: deployer,
-          proxyContract: 'OpenZeppelinTransparentProxy',
-          methodName: 'postUpgrade'
+          proxyContract: 'OpenZeppelinTransparentProxy'
+          // methodName: 'postUpgrade'
         }
       : undefined;
   const PROXY_SETTINGS = network.live && network.tags.staging ? {} : undefined;

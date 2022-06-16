@@ -22,5 +22,5 @@ contract GiverUpgradeable is Giver {
     }
 
     uint256[50] private __gap;
-    address private upgrader;
+    address public upgrader;
 }
