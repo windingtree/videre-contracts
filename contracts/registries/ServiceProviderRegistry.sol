@@ -10,6 +10,11 @@ import {IServiceProviderRegistry, Role} from '../interfaces/IServiceProviderRegi
 import {AbstractTimestampedAccessControl} from '../access/AbstractTimestampedAccessControl.sol';
 import {AbstractWhitelistExpiry} from '../access/AbstractWhitelistExpiry.sol';
 
+struct ServiceProviderConfig {
+    uint128 exists;
+    uint128 maxTTL;
+}
+
 /// @title A source of service providers
 /// @author mfw78 <mfw78@protonmail.com>
 contract ServiceProviderRegistry is
@@ -22,7 +27,7 @@ contract ServiceProviderRegistry is
 
     // TODO: Analyse setting maximum TTL for accounts to prevent malicious signers granting tickets.
     mapping(bytes32 => string) public datastores;
-    mapping(bytes32 => uint256) public maxTTL;
+    mapping(bytes32 => ServiceProviderConfig) public config;
     uint256 public minTTL;
 
     // --- auth ---
@@ -91,13 +96,9 @@ contract ServiceProviderRegistry is
 
     /// @dev Addresses subjected to whitelisting for defined period of time.
     /// @inheritdoc IServiceProviderRegistry
-    function enroll(bytes32 salt, string calldata dataURI) external override onlyWhitelist returns (bytes32 provider) {
+    function enroll(bytes32 salt) external override onlyWhitelist returns (bytes32 provider) {
         provider = keccak256(abi.encode(salt, _msgSender()));
         require(!exists(provider), 'registry/provider-exists');
-        require(bytes(dataURI).length > 0, 'registry/require-uri');
-
-        /// @dev add data URI and set permissions
-        datastores[provider] = dataURI;
 
         /// @dev setup roles
         bytes32 adminRole = _calcRole(provider, Role.ADMIN);
@@ -109,12 +110,19 @@ contract ServiceProviderRegistry is
         _setRoleAdmin(_calcRole(provider, Role.MANAGER), adminRole);
         _setRoleAdmin(_calcRole(provider, Role.STAFF), adminRole);
 
+        /// @dev make sure exists
+        config[provider].exists = 1;
+
         emit ServiceProviderRegistered(provider, _msgSender());
     }
 
     /// @inheritdoc IServiceProviderRegistry
     function exists(bytes32 which) public view returns (bool) {
-        return (bytes(datastores[which]).length > 0);
+        return (config[which].exists != 0);
+    }
+
+    function maxTTL(bytes32 which) public view returns (uint128) {
+        return (config[which].maxTTL);
     }
 
     /// @inheritdoc IServiceProviderRegistry
@@ -136,7 +144,8 @@ contract ServiceProviderRegistry is
         uint256 data
     ) external onlyAdmin(which) {
         if (what == 'maxTTL') {
-            maxTTL[which] = data;
+            require(data <= type(uint128).max, 'registry/param-overflow');
+            config[which].maxTTL = uint128(data);
             emit ServiceProviderUpdated(which, what);
         } else revert('registry/file-unrecognized-param');
     }
