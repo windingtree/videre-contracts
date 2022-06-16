@@ -177,7 +177,7 @@ describe('LineRegistry', function () {
         terms = '0x000000000000000000000000000000000000bEEF';
 
         await deployer.lRegistry['file(bytes32,bytes32,address)'](utils.formatBytes32String('terms'), line, terms);
-        serviceProviderId = await bob.spRegistry.callStatic.enroll(SP_SALT, SP_URI);
+        serviceProviderId = await bob.spRegistry.callStatic.enroll(SP_SALT);
       });
       it('hope is guarded', async () => {
         await expect(alice.lRegistry.hope(line, serviceProviderId)).to.be.revertedWith('registry/not-authorized');
@@ -204,10 +204,10 @@ describe('LineRegistry', function () {
       let terms: string;
 
       beforeEach('register service provider', async () => {
-        serviceProviderId = await bob.spRegistry.callStatic.enroll(SP_SALT, SP_URI);
+        serviceProviderId = await bob.spRegistry.callStatic.enroll(SP_SALT);
         line = utils.formatBytes32String('some_line');
         terms = '0x000000000000000000000000000000000000bEEF';
-        await bob.spRegistry.enroll(SP_SALT, SP_URI);
+        await bob.spRegistry.enroll(SP_SALT);
       });
 
       it('register a service provider for an economic line', async () => {

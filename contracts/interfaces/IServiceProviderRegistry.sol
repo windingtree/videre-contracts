@@ -25,9 +25,8 @@ interface IServiceProviderRegistry {
     event ServiceProviderUpdated(bytes32 which, bytes32 what);
 
     /// @notice Enroll a service provider in the registry
-    /// @dev Require the dataURI to be specified
     /// @return The service provider's identifier
-    function enroll(bytes32 salt, string memory dataURI) external returns (bytes32);
+    function enroll(bytes32 salt) external returns (bytes32);
 
     /// @notice set a specific string on a service provider
     /// @param which service provider to set the string on

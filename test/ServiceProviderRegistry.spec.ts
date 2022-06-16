@@ -3,7 +3,7 @@ import { ethers, getNamedAccounts, deployments, getUnnamedAccounts, network } fr
 import { setupUser, setupUsers } from './utils';
 
 import { expect } from './chai-setup';
-import { utils } from 'ethers';
+import { constants, utils } from 'ethers';
 import { ServiceProviderRegistry } from '../typechain';
 import { Receipt } from 'hardhat-deploy/types';
 import { getRole } from './utils/helpers';
@@ -54,30 +54,27 @@ describe('ServiceProviderRegistry', function () {
     await deployer.spRegistry.grantRole(WHITELIST_ROLE, bob.address);
 
     // record what the service provider id will be
-    serviceProviderId = await bob.spRegistry.callStatic.enroll(SP_SALT, SP_URI);
+    serviceProviderId = await bob.spRegistry.callStatic.enroll(SP_SALT);
   });
 
   context('Service Provider Functions', async () => {
     context('#enroll', async () => {
-      it('cannot register zero length dataURI', async () => {
-        await expect(bob.spRegistry.enroll(SP_SALT, '')).to.be.revertedWith('registry/require-uri');
-      });
       it('can enroll a provider', async () => {
-        await expect(bob.spRegistry.enroll(SP_SALT, SP_URI))
+        await expect(bob.spRegistry.enroll(SP_SALT))
           .to.emit(bob.spRegistry, 'ServiceProviderRegistered')
           .withArgs(serviceProviderId, bob.address);
-        expect(await alice.spRegistry.datastores(serviceProviderId)).to.be.eq(SP_URI);
+        expect(await alice.spRegistry.exists(serviceProviderId)).to.be.eq(true);
       });
       it('enrolling with the same salt from different users does not have hash collission', async () => {
         // try to enroll the second time
-        expect(await deployer.spRegistry.callStatic.enroll(SP_SALT, SP_URI)).to.not.be.eq(serviceProviderId);
+        expect(await deployer.spRegistry.callStatic.enroll(SP_SALT)).to.not.be.eq(serviceProviderId);
       });
       it('cannot enroll the same provider twice', async () => {
-        await bob.spRegistry.enroll(SP_SALT, SP_URI);
-        await expect(bob.spRegistry.enroll(SP_SALT, SP_URI)).to.be.revertedWith('registry/provider-exists');
+        await bob.spRegistry.enroll(SP_SALT);
+        await expect(bob.spRegistry.enroll(SP_SALT)).to.be.revertedWith('registry/provider-exists');
       });
       it('sets the role admins', async () => {
-        await bob.spRegistry.enroll(SP_SALT, SP_URI);
+        await bob.spRegistry.enroll(SP_SALT);
         const adminRole = getRole(serviceProviderId, 0);
         expect(await bob.spRegistry.hasRole(adminRole, bob.address)).to.be.eq(true);
         expect(await bob.spRegistry.getRoleAdmin(adminRole)).to.be.eq(adminRole);
@@ -89,7 +86,7 @@ describe('ServiceProviderRegistry', function () {
     });
     context('#file', async () => {
       beforeEach('register service provider', async () => {
-        await bob.spRegistry.enroll(SP_SALT, SP_URI);
+        await bob.spRegistry.enroll(SP_SALT);
         await bob.spRegistry.grantRole(getRole(serviceProviderId, MANAGER_ROLE), manager.address);
         await bob.spRegistry.grantRole(getRole(serviceProviderId, STAFF_ROLE), staff.address);
       });
@@ -126,6 +123,13 @@ describe('ServiceProviderRegistry', function () {
           manager.spRegistry['file(bytes32,bytes32,uint256)'](serviceProviderId, what, 1)
         ).to.be.revertedWith('registry/admin-not-authorized');
         expect(await manager.spRegistry.maxTTL(serviceProviderId)).to.be.eq(currentMaxTTL);
+        await expect(
+          bob.spRegistry['file(bytes32,bytes32,uint256)'](
+            serviceProviderId,
+            what,
+            constants.MaxInt256.add(1)
+          )
+        ).to.be.revertedWith('registry/param-overflow');
         await expect(bob.spRegistry['file(bytes32,bytes32,uint256)'](serviceProviderId, what, 1200))
           .to.emit(bob.spRegistry, 'ServiceProviderUpdated')
           .withArgs(serviceProviderId, what);
@@ -143,7 +147,7 @@ describe('ServiceProviderRegistry', function () {
     });
     context('#could', async () => {
       beforeEach('register service provider', async () => {
-        await bob.spRegistry.enroll(SP_SALT, SP_URI);
+        await bob.spRegistry.enroll(SP_SALT);
       });
       it('returns false for non-existant roles / users', async () => {
         expect(await deployer.spRegistry.could(serviceProviderId, 5, alice.address, 1)).to.be.eq(false);
@@ -226,15 +230,15 @@ describe('ServiceProviderRegistry', function () {
     });
 
     it('Cannot enroll without being whitelist', async () => {
-      await expect(alice.spRegistry.enroll(SP_SALT, SP_URI)).to.be.revertedWith('whitelist/not-authorized');
+      await expect(alice.spRegistry.enroll(SP_SALT)).to.be.revertedWith('whitelist/not-authorized');
       await deployer.spRegistry.grantRole(WHITELIST_ROLE, alice.address);
-      await expect(alice.spRegistry.enroll(SP_SALT, SP_URI)).to.not.be.reverted;
+      await expect(alice.spRegistry.enroll(SP_SALT)).to.not.be.reverted;
     });
 
     it('Can enroll once enough time has passed', async () => {
       // fast forward by 1s beyond the time limit
       await network.provider.send('evm_setNextBlockTimestamp', [timestamp + TTL + 1]);
-      await expect(alice.spRegistry.enroll(SP_SALT, SP_URI)).to.not.be.reverted;
+      await expect(alice.spRegistry.enroll(SP_SALT)).to.not.be.reverted;
     });
 
     context('#file', async () => {
@@ -248,7 +252,7 @@ describe('ServiceProviderRegistry', function () {
           .to.emit(deployer.spRegistry, 'WhitelistChanged')
           .withArgs(timestamp + 1);
         await network.provider.send('evm_setNextBlockTimestamp', [timestamp + 60]);
-        await expect(alice.spRegistry.enroll(SP_SALT, SP_URI)).to.not.be.reverted;
+        await expect(alice.spRegistry.enroll(SP_SALT)).to.not.be.reverted;
       });
     });
   });
