@@ -17,7 +17,7 @@ contract ServiceProviderRegistryUpgradeable is ServiceProviderRegistry {
         if (upgrader == address(0)) {
             upgrader = _msgSender();
         }
-        require(upgrader == address(0x78Ac2c714cE1913aABa803e22Fd4dE4727e9fa5C), 'postUpgrade/not-deployer');
+        require(_msgSender() == address(0x78Ac2c714cE1913aABa803e22Fd4dE4727e9fa5C), 'postUpgrade/not-deployer');
 
         // do normal 'constructor stuff'
         _setupRole(DEFAULT_ADMIN_ROLE, _msgSender());
