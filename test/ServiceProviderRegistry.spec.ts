@@ -124,11 +124,7 @@ describe('ServiceProviderRegistry', function () {
         ).to.be.revertedWith('registry/admin-not-authorized');
         expect(await manager.spRegistry.maxTTL(serviceProviderId)).to.be.eq(currentMaxTTL);
         await expect(
-          bob.spRegistry['file(bytes32,bytes32,uint256)'](
-            serviceProviderId,
-            what,
-            constants.MaxInt256.add(1)
-          )
+          bob.spRegistry['file(bytes32,bytes32,uint256)'](serviceProviderId, what, constants.MaxInt256.add(1))
         ).to.be.revertedWith('registry/param-overflow');
         await expect(bob.spRegistry['file(bytes32,bytes32,uint256)'](serviceProviderId, what, 1200))
           .to.emit(bob.spRegistry, 'ServiceProviderUpdated')
