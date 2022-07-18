@@ -171,6 +171,7 @@ library LibVidere {
         bytes32 provider; // facility
         bytes32 state; // eip712 signed hash of stub's state
         uint256 step; // what step in the lifecycle the stub is at
+        uint256 timestamp; // when stub is created
         mapping(address => bytes) terms; // term => 1/0 or payload
     }
 
